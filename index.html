@@ -1,284 +1,183 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>ติดตามงานสำรวจรายเดือน | สำนักงานสถิติจังหวัดหนองบัวลำภู</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600&family=Noto+Serif+Thai:wght@600;700&display=swap" rel="stylesheet">
-<style>
-  :root {
-    --paper:#F3F4F0; --ink:#16212E; --muted:#5E6B75; --rule:#D9DDD6; --navy:#1F3A5F;
-    --done:#2A9D78; --late:#E3A21A; --overdue:#D1432F; --pending:#CDD3CB; --pending-edge:#AEB6AD;
-    --band:#FBE9E5; --good:#E2F2EB;
-    --sans:'IBM Plex Sans Thai','Noto Sans Thai',system-ui,sans-serif;
-    --serif:'Noto Serif Thai','Noto Serif',Georgia,serif;
-  }
-  @media (prefers-color-scheme: dark) {
-    :root { --paper:#121A22; --ink:#E8ECE9; --muted:#9AA7B0; --rule:#26323D; --navy:#8FB0DA;
-      --done:#3DB892; --late:#EDB43A; --overdue:#E8624F; --pending:#2B3844; --pending-edge:#3C4B59;
-      --band:#3A1E1A; --good:#16302A; }
-  }
-  * { box-sizing:border-box; }
-  html { -webkit-text-size-adjust:100%; }
-  body { margin:0; background:var(--paper); color:var(--ink); font-family:var(--sans); font-size:16px; line-height:1.6; }
-  button { font:inherit; color:inherit; }
-  :focus-visible { outline:2px solid var(--navy); outline-offset:2px; }
-  .wrap { max-width:1080px; margin:0 auto; padding:0 20px; }
-
-  /* ส่วนหัว */
-  .top { display:flex; justify-content:space-between; align-items:center; gap:16px; padding:18px 0 14px; flex-wrap:wrap; }
-  .brand { display:flex; align-items:center; gap:12px; }
-  .mark { display:grid; grid-template-columns:repeat(3,8px); gap:2px; }
-  .mark i { width:8px; height:8px; border-radius:2px; background:var(--done); }
-  .mark i:nth-child(2n) { background:var(--navy); } .mark i:nth-child(4) { background:var(--late); }
-  .mark i:nth-child(7) { background:var(--overdue); } .mark i:nth-child(5) { background:var(--pending-edge); }
-  .brand b { display:block; font-weight:600; line-height:1.3; }
-  .brand span { display:block; color:var(--muted); font-size:14px; line-height:1.3; }
-  .tools { display:flex; gap:12px; align-items:center; flex-wrap:wrap; }
-  .tools a { color:var(--navy); font-weight:500; }
-  select { font:inherit; padding:7px 10px; border:1px solid var(--rule); border-radius:6px; background:var(--paper); color:var(--ink); max-width:100%; }
-
-  .months { display:flex; gap:6px; overflow-x:auto; padding:4px 0 6px; border-top:1px solid var(--rule); padding-top:12px; }
-  .months button { flex:none; padding:5px 13px; border:1px solid var(--rule); border-radius:6px; background:transparent; cursor:pointer; }
-  .months button[aria-pressed="true"] { background:var(--navy); border-color:var(--navy); color:var(--paper); }
-
-  .demo { margin-top:10px; padding:8px 12px; border-left:3px solid var(--late); background:var(--good); font-size:14px; }
-  .demo[hidden], .me[hidden], .empty[hidden] { display:none; }
-
-  /* หัวเรื่องและสถานะ */
-  h1 { font-family:var(--serif); font-weight:700; font-size:clamp(26px,4.4vw,42px); line-height:1.35; margin:28px 0 20px; max-width:22em; }
-  .legend { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:10px 24px; margin:0 0 8px; }
-  .legend button { display:grid; grid-template-columns:auto 1fr; column-gap:10px; align-items:center; text-align:left;
-    background:none; border:0; padding:6px 0; cursor:pointer; border-bottom:2px solid transparent; }
-  .legend button[aria-pressed="true"] { border-bottom-color:var(--ink); }
-  .sw { grid-row:span 2; width:14px; height:44px; border-radius:3px; background:var(--c); }
-  .sw.pending { box-shadow:inset 0 0 0 1.5px var(--pending-edge); }
-  .legend .n { font-family:var(--serif); font-weight:700; font-size:26px; line-height:1.15; }
-  .legend .l { color:var(--muted); font-size:14px; line-height:1.3; }
-  .hint { color:var(--muted); font-size:13px; margin:0 0 4px; }
-
-  /* แจ้งเตือนของฉัน */
-  .me { margin:18px 0 0; padding:14px 16px; background:var(--band); border-left:4px solid var(--overdue); }
-  .me.clear { background:var(--good); border-left-color:var(--done); }
-  .me p { margin:0; font-weight:600; } .me ul { margin:6px 0 0; padding-left:18px; }
-
-  /* แผนที่ EA */
-  .map { margin-top:8px; }
-  .group { margin-top:20px; }
-  .group h3 { margin:0 0 8px; font-size:15px; font-weight:600; display:flex; gap:10px; align-items:baseline; }
-  .group h3 span { color:var(--muted); font-weight:400; font-size:14px; }
-  .tiles { display:flex; flex-wrap:wrap; gap:5px; }
-  .tile { --t:clamp(24px,3.4vw,32px); width:var(--t); height:var(--t); padding:0; border:0; border-radius:4px;
-    background:var(--c); cursor:pointer; transition:opacity .2s;
-    animation:pop .4s backwards; animation-delay:calc(var(--i) * 14ms); }
-  .tile.pending { box-shadow:inset 0 0 0 1.5px var(--pending-edge); background:var(--pending); }
-  .tile.dim { opacity:.16; }
-  @keyframes pop { from { opacity:0; transform:scale(.55); } }
-  .empty { margin:28px 0; padding:20px; border:1px dashed var(--pending-edge); }
-  .empty a { color:var(--navy); font-weight:500; }
-
-  /* รายบุคคล / รายโครงการ */
-  .lists { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr)); gap:16px 56px; margin:48px 0 56px; }
-  h2 { font-family:var(--serif); font-size:22px; margin:0 0 6px; }
-  .row { display:grid; grid-template-columns:1fr auto; gap:2px 12px; width:100%; text-align:left; padding:12px 8px 12px 10px;
-    background:none; border:0; border-bottom:1px solid var(--rule); cursor:pointer; }
-  .row[aria-pressed="true"] { box-shadow:inset 3px 0 0 var(--navy); background:color-mix(in srgb, var(--navy) 7%, transparent); }
-  .row .name { font-weight:500; } .row .frac { color:var(--muted); font-variant-numeric:tabular-nums; }
-  .row .note { grid-column:1/-1; font-size:13px; color:var(--muted); display:flex; gap:14px; flex-wrap:wrap; }
-  .row .note .bad { color:var(--overdue); font-weight:600; }
-  .bar { grid-column:1/-1; display:flex; gap:2px; height:10px; margin:6px 0 2px; }
-  .bar i { flex:var(--n) 1 0; background:var(--c); border-radius:2px; min-width:0; }
-  .bar i.pending { background:var(--pending); box-shadow:inset 0 0 0 1px var(--pending-edge); }
-
-  #tip { position:fixed; z-index:10; pointer-events:none; background:var(--ink); color:var(--paper); padding:8px 11px;
-    border-radius:6px; font-size:13px; line-height:1.5; max-width:240px; opacity:0; transition:opacity .12s; }
-  #tip.on { opacity:1; } #tip b { font-weight:600; }
-  @media (prefers-reduced-motion: reduce) { .tile { animation:none; } .tile, #tip { transition:none; } }
-</style>
+  <base target="_top">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ระบบติดตามงานสำรวจ | หนองบัวลำภู</title>
+  <style>
+    :root{--navy:#17365d;--blue:#2563eb;--bg:#f3f6fb;--text:#182230;--muted:#65758b;--line:#dbe3ee;--green:#15803d;--orange:#c2410c;--red:#b91c1c;--purple:#7e22ce;--gray:#64748b}
+    *{box-sizing:border-box} body{margin:0;font-family:Tahoma,"Noto Sans Thai",sans-serif;background:var(--bg);color:var(--text)}
+    header{background:linear-gradient(120deg,#17365d,#245a8d);color:#fff;padding:22px clamp(16px,3vw,40px);box-shadow:0 3px 12px #17365d20}
+    header h1{margin:0 0 6px;font-size:clamp(20px,3vw,30px)}header p{margin:0;color:#e4eefb;font-size:14px}
+    main{max-width:1500px;margin:auto;padding:22px clamp(12px,2.5vw,32px) 44px}
+    .topbar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:18px}
+    .tabs{display:flex;gap:8px;flex-wrap:wrap}.tab{border:1px solid var(--line);background:#fff;color:var(--navy);border-radius:10px;padding:10px 14px;cursor:pointer;font-weight:700}.tab.active{background:var(--navy);color:#fff;border-color:var(--navy)}
+    button{font:inherit;cursor:pointer;border:0;border-radius:9px;padding:10px 14px;font-weight:700}.primary{background:var(--blue);color:#fff}.secondary{background:#e6edf7;color:var(--navy)}.danger{background:#fee2e2;color:#991b1b}
+    .panel{background:#fff;border:1px solid var(--line);border-radius:14px;padding:18px;margin-bottom:18px;box-shadow:0 4px 18px #1c36520a}.panel h2{font-size:18px;margin:0 0 16px;color:var(--navy)}
+    .filters,.formgrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}.field{display:flex;flex-direction:column;gap:6px;min-width:0}.field label{font-size:12px;color:#46566d;font-weight:700}.field input,.field select,.field textarea{width:100%;padding:10px;border:1px solid #cbd5e1;border-radius:8px;background:#fff;color:var(--text);font:inherit;font-size:14px}.field textarea{min-height:80px;resize:vertical}.field.full{grid-column:1/-1}.form-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+    .cards{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;margin-bottom:18px}.metric{background:#fff;border:1px solid var(--line);border-radius:13px;padding:15px;position:relative;overflow:hidden}.metric:before{content:"";position:absolute;left:0;top:0;bottom:0;width:5px;background:var(--accent,#64748b)}.metric .label{font-size:12px;color:var(--muted);font-weight:700}.metric .number{font-size:clamp(25px,3vw,36px);font-weight:800;line-height:1.25;margin:7px 0 2px;color:#111827}.metric .hint{font-size:11px;color:var(--muted)}
+    .grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px}.barrow{display:grid;grid-template-columns:minmax(110px,1fr) 3fr 42px;gap:10px;align-items:center;margin:12px 0;font-size:12px}.barname{overflow-wrap:anywhere}.bartrack{height:12px;border-radius:20px;background:#e9eef5;overflow:hidden}.barfill{height:100%;border-radius:20px;background:var(--blue)}.barvalue{text-align:right;font-weight:800}
+    .tablewrap{overflow:auto;border:1px solid var(--line);border-radius:10px}table{border-collapse:collapse;width:100%;min-width:950px;font-size:12px}th,td{padding:10px 9px;border-bottom:1px solid #e6ebf2;text-align:left;vertical-align:top}th{background:#edf3fa;color:#18385f;position:sticky;top:0;z-index:1;white-space:nowrap}tr:last-child td{border-bottom:0}.status{display:inline-block;padding:5px 8px;border-radius:20px;font-size:11px;font-weight:800;white-space:nowrap}.s-not{background:#e2e8f0;color:#334155}.s-progress{background:#dbeafe;color:#1d4ed8}.s-review{background:#ffedd5;color:#9a3412}.s-reviewed{background:#f3e8ff;color:#6b21a8}.s-approved,.s-done{background:#dcfce7;color:#166534}.s-late{background:#fee2e2;color:#991b1b}.s-edit{background:#fef3c7;color:#92400e}
+    .hidden{display:none!important}.notice{padding:12px 14px;border-radius:9px;margin-bottom:14px;font-size:13px;display:none}.notice.ok{display:block;background:#dcfce7;color:#166534}.notice.err{display:block;background:#fee2e2;color:#991b1b}.muted{color:var(--muted);font-size:12px}.statusline{display:flex;align-items:center;gap:8px;color:#d9e7f6;font-size:12px}.dot{width:8px;height:8px;border-radius:50%;background:#86efac}.loading{opacity:.55;pointer-events:none}
+    @media(max-width:1050px){.cards{grid-template-columns:repeat(3,minmax(0,1fr))}.filters,.formgrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+    @media(max-width:650px){.cards{grid-template-columns:repeat(2,minmax(0,1fr))}.grid2{grid-template-columns:1fr}.filters,.formgrid{grid-template-columns:1fr}.field.full{grid-column:auto}.metric{padding:12px}.topbar{align-items:flex-start}}
+  </style>
 </head>
 <body>
-<div class="wrap">
-  <header class="top">
-    <div class="brand">
-      <div class="mark" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
-      <div><b>สำนักงานสถิติจังหวัดหนองบัวลำภู</b><span>ติดตามงานสำรวจรายเดือน</span></div>
+<header>
+  <h1>ระบบติดตามงานสำรวจ</h1>
+  <p>สำนักงานสถิติจังหวัดหนองบัวลำภู · ปีงบประมาณ 2570</p>
+  <div class="statusline" style="margin-top:12px"><span class="dot"></span><span id="connectionText">กำลังเชื่อมต่อ Google Sheets…</span><span id="lastUpdated"></span></div>
+</header>
+<main>
+  <div id="notice" class="notice"></div>
+  <div class="topbar">
+    <div class="tabs">
+      <button class="tab active" data-view="dashboard">Dashboard</button>
+      <button class="tab" data-view="monthly">แบบฟอร์ม 1 · แผนรายเดือน</button>
+      <button class="tab" data-view="daily">แบบฟอร์ม 2 · ติดตามรายวัน</button>
+      <button class="tab" data-view="ea">ทะเบียน EA</button>
+      <button class="tab" data-view="history">ประวัติการบันทึก</button>
     </div>
-    <div class="tools">
-      <label for="me" class="sr" style="position:absolute;left:-9999px">เลือกชื่อของฉัน</label>
-      <select id="me"><option value="">ดูในฐานะ: ทุกคน</option></select>
-      <a href="form.html">กรอกข้อมูล</a>
+    <button class="secondary" onclick="refreshAll()">↻ รีเฟรชข้อมูล</button>
+  </div>
+
+  <section id="view-dashboard">
+    <div class="panel">
+      <h2>ตัวกรองข้อมูล</h2>
+      <div class="filters">
+        <div class="field"><label>ปีงบประมาณ</label><select id="filterFY"><option value="2570">2570</option><option value="2569">2569</option></select></div>
+        <div class="field"><label>เดือน</label><select id="filterMonth"><option value="">ทุกเดือน</option></select></div>
+        <div class="field"><label>สัปดาห์ (ISO)</label><select id="filterWeek"><option value="">ทุกสัปดาห์</option></select></div>
+        <div class="field"><label>ผู้รับผิดชอบ</label><select id="filterPerson"><option value="">ทุกคน</option></select></div>
+        <div class="field" style="grid-column:span 2"><label>โครงการ</label><select id="filterProject"><option value="">ทุกโครงการ</option></select></div>
+        <div class="field"><label>สถานะ</label><select id="filterStatus"><option value="">ทุกสถานะ</option></select></div>
+        <div class="field" style="align-self:end"><button class="primary" onclick="loadDashboard()">ใช้ตัวกรอง</button></div>
+      </div>
     </div>
-  </header>
-  <nav class="months" id="months" aria-label="เลือกเดือน"></nav>
-  <div class="demo" id="demo" hidden>กำลังแสดงข้อมูลตัวอย่าง ใส่ URL ของ Apps Script ในตัวแปร API เพื่อดูข้อมูลจริง</div>
-
-  <main>
-    <h1 id="headline" aria-live="polite">กำลังโหลด…</h1>
-    <div class="legend" id="legend"></div>
-    <p class="hint">แต่ละช่องคือ 1 EA เลื่อนเมาส์เพื่อดูรายละเอียด หรือกดสถานะ/ชื่อเพื่อเน้นเฉพาะรายการนั้น</p>
-    <div class="me" id="meBox" hidden></div>
-
-    <section class="map" id="map" aria-label="แผนที่ EA ของเดือนนี้"></section>
-    <div class="empty" id="empty" hidden>ยังไม่มีแผนงานของเดือนนี้ <a href="form.html">กำหนดแผนรายเดือน</a></div>
-
-    <div class="lists">
-      <section><h2>รายบุคคล</h2><div id="persons"></div></section>
-      <section><h2>รายโครงการ</h2><div id="projects"></div></section>
+    <div class="cards" id="metricCards"></div>
+    <div class="grid2">
+      <div class="panel"><h2>ความคืบหน้ารายโครงการ</h2><div id="projectBars"></div></div>
+      <div class="panel"><h2>ความคืบหน้ารายบุคคล</h2><div id="personBars"></div></div>
     </div>
-  </main>
-</div>
-<div id="tip" role="tooltip"></div>
+    <div class="panel"><h2>รายละเอียด EA ล่าสุด</h2><p class="muted">แต่ละ EA แสดงสถานะล่าสุดเพียงรายการเดียว เพื่อไม่ให้ประวัติการบันทึกหลายวันทำให้ยอดรวมซ้ำ</p><div class="tablewrap"><table><thead><tr><th>ผู้รับผิดชอบ</th><th>โครงการ</th><th>EA</th><th>สถานะล่าสุด</th><th>วันครบกำหนด</th><th>วันที่เสร็จ</th><th>การตรวจ</th><th>ผู้ตรวจ</th><th>การอนุมัติ</th><th>ล่าช้า (วัน)</th><th>สาเหตุ/หมายเหตุ</th></tr></thead><tbody id="dashboardRows"></tbody></table></div></div>
+  </section>
 
+  <section id="view-monthly" class="hidden">
+    <div class="panel">
+      <h2>แบบฟอร์มที่ 1 · งานประจำเดือนก่อนออกสำรวจ</h2>
+      <form id="monthlyForm">
+        <div class="formgrid">
+          <div class="field"><label>ปีงบประมาณ *</label><select name="FiscalYear" required><option>2570</option><option>2569</option></select></div>
+          <div class="field"><label>เดือน *</label><select name="Month" id="monthlyMonth" required></select></div>
+          <div class="field"><label>ผู้รับผิดชอบ *</label><select name="Assignee" class="peopleSelect" required></select></div>
+          <div class="field"><label>โครงการ *</label><select name="Project" class="projectSelect" required></select></div>
+          <div class="field"><label>EA จากทะเบียนหลัก *</label><select name="EA_ID" class="eaSelect" required></select></div>
+          <div class="field"><label>เป้าหมายจำนวน EA *</label><input name="TargetEA" type="number" min="1" value="1" required></div>
+          <div class="field"><label>วันที่เริ่มงาน *</label><input name="StartDate" type="date" required></div>
+          <div class="field"><label>วันที่ครบกำหนด *</label><input name="DueDate" type="date" required></div>
+          <div class="field"><label>วันเริ่มลงพื้นที่ *</label><input name="FieldworkStart" type="date" required></div>
+          <div class="field"><label>วันสิ้นสุดลงพื้นที่ *</label><input name="FieldworkEnd" type="date" required></div>
+          <div class="field full"><label>งาน/ภารกิจที่ต้องทำก่อนออกสำรวจ *</label><textarea name="MonthlyTask" required placeholder="เช่น ตรวจสอบแบบสอบถาม เตรียมอุปกรณ์ ประสานงานพื้นที่"></textarea></div>
+          <div class="field full"><label>หมายเหตุ/ปัญหาที่คาดว่าจะเกิดขึ้น</label><textarea name="Notes"></textarea></div>
+          <div class="field full"><label>สาเหตุความล่าช้า (กรอกเมื่อเลยกำหนด)</label><textarea name="DelayReason"></textarea></div>
+        </div>
+        <div class="form-actions"><button class="primary" type="submit">บันทึกแผนรายเดือน</button><button class="secondary" type="reset">ล้างแบบฟอร์ม</button></div>
+      </form>
+    </div>
+    <div class="panel"><h2>แผนรายเดือนที่บันทึกไว้</h2><div class="tablewrap"><table><thead><tr><th>เดือน</th><th>ผู้รับผิดชอบ</th><th>โครงการ</th><th>EA</th><th>เริ่มงาน</th><th>ครบกำหนด</th><th>ลงพื้นที่</th><th>ภารกิจ</th><th>สถานะ</th></tr></thead><tbody id="monthlyRows"></tbody></table></div></div>
+  </section>
+
+  <section id="view-daily" class="hidden">
+    <div class="panel">
+      <h2>แบบฟอร์มที่ 2 · ติดตามงานรายวันรายบุคคล</h2>
+      <form id="dailyForm">
+        <div class="formgrid">
+          <div class="field"><label>วันที่รายงานผล *</label><input name="WorkDate" type="date" required></div>
+          <div class="field"><label>ปีงบประมาณ *</label><select name="FiscalYear" required><option>2570</option><option>2569</option></select></div>
+          <div class="field"><label>เดือน *</label><select name="Month" id="dailyMonth" required></select></div>
+          <div class="field"><label>ผู้รับผิดชอบ *</label><select name="Assignee" class="peopleSelect" required></select></div>
+          <div class="field"><label>โครงการ *</label><select name="Project" class="projectSelect" required></select></div>
+          <div class="field"><label>EA จากทะเบียนหลัก *</label><select name="EA_ID" class="eaSelect" required></select></div>
+          <div class="field"><label>สถานะความคืบหน้า *</label><select name="ProgressStatus" id="progressStatus" required></select></div>
+          <div class="field"><label>วันที่ดำเนินการแล้วเสร็จ</label><input name="CompletedDate" type="date" id="completedDate"></div>
+          <div class="field"><label>สถานะการตรวจ *</label><select name="ReviewStatus" id="reviewStatus" required><option value="ยังไม่ตรวจ">ยังไม่ตรวจ</option><option value="ตรวจแล้ว">ตรวจแล้ว</option></select></div>
+          <div class="field"><label>ชื่อผู้ตรวจ</label><select name="Reviewer" id="reviewerSelect"></select></div>
+          <div class="field"><label>วันที่ตรวจ</label><input name="ReviewDate" type="date" id="reviewDate"></div>
+          <div class="field"><label>สถานะการอนุมัติ *</label><select name="ApprovalStatus" id="approvalStatus" required><option value="ยังไม่อนุมัติ">ยังไม่อนุมัติ</option><option value="อนุมัติแล้ว">อนุมัติแล้ว</option></select></div>
+          <div class="field"><label>ชื่อผู้อนุมัติ</label><select name="Approver" id="approverSelect"></select></div>
+          <div class="field"><label>วันที่อนุมัติ</label><input name="ApprovalDate" type="date" id="approvalDate"></div>
+          <div class="field"><label>วันครบกำหนด (ถ้าต้องการระบุเอง)</label><input name="DueDate" type="date"></div>
+          <div class="field full"><label>หมายเหตุ/ปัญหาที่พบ</label><textarea name="Notes"></textarea></div>
+          <div class="field full"><label>สาเหตุความล่าช้า (บังคับเมื่อเลยกำหนด)</label><textarea name="DelayReason" id="delayReason"></textarea></div>
+        </div>
+        <p class="muted">ระบบจะคำนวณสัปดาห์และจำนวนวันล่าช้าจากวันที่รายงานและวันครบกำหนด/แผนงาน หากงานเสร็จแล้วให้ระบุวันที่แล้วเสร็จ</p>
+        <div class="form-actions"><button class="primary" type="submit">บันทึกผลรายวัน</button><button class="secondary" type="reset">ล้างแบบฟอร์ม</button></div>
+      </form>
+    </div>
+    <div class="panel"><h2>รายการติดตามรายวันที่บันทึกไว้</h2><p class="muted">รายการใหม่จะเพิ่มเป็นประวัติ ไม่เขียนทับรายการเดิม</p><div class="tablewrap"><table><thead><tr><th>วันที่รายงาน</th><th>ผู้รับผิดชอบ</th><th>โครงการ</th><th>EA</th><th>สถานะ</th><th>ตรวจ</th><th>ผู้ตรวจ</th><th>อนุมัติ</th><th>วันล่าช้า</th><th>สาเหตุ</th></tr></thead><tbody id="dailyRows"></tbody></table></div></div>
+  </section>
+
+  <section id="view-ea" class="hidden">
+    <div class="panel">
+      <h2>ทะเบียน EA หลัก</h2>
+      <p class="muted">เพิ่ม EA ก่อนจึงจะเลือกในแบบฟอร์มแผนรายเดือนและติดตามรายวันได้ ข้อมูล EA ที่แนบมาเดิมเป็นตัวอย่างโครงการ สรง. เดือนตุลาคม 2569 ควรตรวจสอบก่อนนำมาใช้จริง</p>
+      <form id="eaForm"><div class="formgrid">
+        <div class="field"><label>ปีข้อมูล *</label><select name="FiscalYear" required><option>2570</option><option>2569</option></select></div>
+        <div class="field"><label>โครงการ *</label><select name="Project" class="projectSelect" required></select></div>
+        <div class="field"><label>ผู้รับผิดชอบ *</label><input name="Assignee" required placeholder="กรอกชื่อผู้รับผิดชอบ"></div>
+        <div class="field"><label>EA *</label><input name="EA" required placeholder="เช่น 0013"></div>
+        <div class="field"><label>PSU-NO.</label><input name="PSU_NO"></div>
+        <div class="field"><label>อำเภอ</label><input name="District"></div>
+        <div class="field"><label>ตำบล</label><input name="Subdistrict"></div>
+        <div class="field"><label>หมู่ที่</label><input name="VillageNo"></div>
+        <div class="field"><label>ชื่อหมู่บ้าน</label><input name="Village"></div>
+      </div><div class="form-actions"><button class="primary" type="submit">เพิ่ม EA ในทะเบียน</button></div></form>
+    </div>
+    <div class="panel"><h2>EA ที่ลงทะเบียนแล้ว</h2><div class="tablewrap"><table><thead><tr><th>ปี</th><th>ผู้รับผิดชอบ</th><th>โครงการ</th><th>PSU-NO.</th><th>EA</th><th>อำเภอ</th><th>ตำบล</th><th>หมู่บ้าน</th></tr></thead><tbody id="eaRows"></tbody></table></div></div>
+  </section>
+
+  <section id="view-history" class="hidden">
+    <div class="panel"><h2>ประวัติการบันทึก (อ่านอย่างเดียว)</h2><p class="muted">รายการนี้เป็นประวัติที่ระบบเพิ่มไว้ทุกครั้งที่บันทึกข้อมูล ไม่สามารถแก้ไขจากหน้าเว็บนี้ได้</p><div class="tablewrap"><table><thead><tr><th>เวลา</th><th>การทำรายการ</th><th>ประเภท</th><th>รหัสรายการ</th><th>ผู้ทำรายการ</th><th>ข้อมูล snapshot</th></tr></thead><tbody id="historyRows"></tbody></table></div></div>
+  </section>
+</main>
 <script>
-// ใส่ URL ของ Web app (Apps Script) ที่ Deploy แล้ว ถ้าเว้นว่างจะแสดงข้อมูลตัวอย่าง
-const API = '';
-
-const MONTHS = ['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน','กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
-const SHORT  = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
-const ORDER  = ['done','late','overdue','pending'];
-const ST = {
-  done:    { label:'ส่งแล้ว',                color:'var(--done)' },
-  late:    { label:'ส่งแล้ว แต่มีส่งช้า',    color:'var(--late)' },
-  overdue: { label:'ค้างส่ง',                color:'var(--overdue)' },
-  pending: { label:'ยังไม่ส่ง',              color:'var(--pending)' }
-};
+const MONTHS = ['ตุลาคม','พฤศจิกายน','ธันวาคม','มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน','กรกฎาคม','สิงหาคม','กันยายน'];
+let APPDATA = {projects:[],reviewers:[],approvers:[],statuses:[],eas:[],plans:[],updates:[]};
+let DASH = null;
 const $ = id => document.getElementById(id);
-const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-
-let month = '', data = null, focus = null, solo = null;
-
-/* ---------- ข้อมูลตัวอย่าง ---------- */
-function demo(m) {
-  const plan = [['สำรวจแรงงาน', ['สมชาย ใจดี','สมหญิง รักงาน'], 10], ['สำรวจการย้ายถิ่น', ['สมชาย ใจดี','สมหญิง รักงาน'], 6],
-                ['สำรวจ ICT ครัวเรือน', ['สมหญิง รักงาน'], 4]];
-  const pat = ['done','done','late','done','overdue','pending','done','done','pending','late'];
-  const cells = []; let k = 0;
-  plan.forEach(([project, people, n]) => { for (let i = 0; i < n; i++, k++) {
-    const status = pat[k % pat.length];
-    cells.push({ ea:'EA-' + String(101 + k).padStart(4, '0'), person:people[i % people.length], project, status,
-      late: status === 'late' ? 1 : 0, overdue: status === 'overdue' ? 1 : 0 }); } });
-  return { month:m, total:{ late:cells.filter(c => c.late).length }, cells };
-}
-
-/* ---------- เดือน ---------- */
-function initMonths() {
-  const now = new Date(), box = $('months');
-  for (let i = 0; i < 6; i++) {
-    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
-    const key = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
-    const b = document.createElement('button');
-    b.textContent = SHORT[d.getMonth()] + ' ' + String(d.getFullYear() + 543).slice(2);
-    b.dataset.m = key; b.dataset.full = MONTHS[d.getMonth()] + ' ' + (d.getFullYear() + 543);
-    b.onclick = () => { month = key; focus = solo = null; syncMe(); load(); };
-    box.appendChild(b);
-    if (i === 0) month = key;
-  }
-}
-
-async function load() {
-  document.querySelectorAll('#months button').forEach(b => b.setAttribute('aria-pressed', b.dataset.m === month));
-  $('demo').hidden = !!API;
-  try {
-    data = API ? await (await fetch(API + '?action=summary&month=' + month)).json() : demo(month);
-  } catch (e) { $('headline').textContent = 'โหลดข้อมูลไม่สำเร็จ: ' + e.message; return; }
-  const sel = $('me'), keep = sel.value;
-  sel.length = 1;
-  [...new Set((data.cells || []).map(c => c.person))].sort((a, b) => a.localeCompare(b, 'th'))
-    .forEach(n => sel.add(new Option(n, n)));
-  sel.value = [...sel.options].some(o => o.value === keep) ? keep : '';
-  render(); loadMe();
-}
-
-/* ---------- คำนวณ ---------- */
-const count = cells => ORDER.reduce((o, s) => (o[s] = cells.filter(c => c.status === s).length, o), {});
-const groupBy = (cells, key) => cells.reduce((o, c) => ((o[c[key]] = o[c[key]] || []).push(c), o), {});
-const match = c => (!focus || c[focus.kind] === focus.value) && (!solo || c.status === solo);
-
-/* ---------- วาดหน้า ---------- */
-function render() {
-  const cells = data.cells || [], n = count(cells), sent = n.done + n.late;
-  const full = document.querySelector('#months button[aria-pressed="true"]').dataset.full;
-
-  $('headline').textContent = cells.length
-    ? 'เดือน' + full + ' ส่งงานแล้ว ' + sent + ' จาก ' + cells.length + ' EA'
-    : 'เดือน' + full + ' ยังไม่มีแผนงาน';
-  $('empty').hidden = cells.length > 0;
-
-  $('legend').innerHTML = ORDER.map(s => `<button data-s="${s}" aria-pressed="${solo === s}" style="--c:${ST[s].color}">
-    <span class="sw ${s === 'pending' ? 'pending' : ''}"></span><span class="n">${n[s]}</span><span class="l">${ST[s].label}</span></button>`).join('');
-  $('legend').querySelectorAll('button').forEach(b => b.onclick = () => { solo = solo === b.dataset.s ? null : b.dataset.s; render(); });
-
-  // แผนที่ EA แบ่งกลุ่มตามโครงการ (1 ช่อง = 1 EA)
-  const byProj = groupBy(cells, 'project'), flat = []; let i = 0;
-  $('map').innerHTML = Object.keys(byProj).sort((a, b) => a.localeCompare(b, 'th')).map(p => {
-    const list = byProj[p], c = count(list);
-    return `<div class="group"><h3>${esc(p)}<span>ส่งแล้ว ${c.done + c.late} จาก ${list.length}</span></h3><div class="tiles">` +
-      list.map(x => `<button class="tile ${x.status} ${match(x) ? '' : 'dim'}" style="--c:${ST[x.status].color};--i:${Math.min(i++, 70)}"
-        data-k="${flat.push(x) - 1}" aria-label="${esc(x.ea)} ${ST[x.status].label}"></button>`).join('') + '</div></div>';
-  }).join('');
-  $('map').querySelectorAll('.tile').forEach(t => {
-    const x = flat[+t.dataset.k];
-    t.onmouseenter = t.onfocus = () => tip(t, x);
-    t.onmouseleave = t.onblur = () => $('tip').classList.remove('on');
-  });
-
-  bars('persons', cells, 'person'); bars('projects', cells, 'project');
-}
-
-function bars(id, cells, kind) {
-  const g = groupBy(cells, kind), names = Object.keys(g).sort((a, b) => a.localeCompare(b, 'th'));
-  $(id).innerHTML = names.length ? names.map(name => {
-    const list = g[name], c = count(list), late = list.reduce((t, x) => t + (x.late || 0), 0);
-    const open = list.reduce((t, x) => t + (x.status === 'overdue' ? (x.overdue || 1) : 0), 0);
-    const on = focus && focus.kind === kind && focus.value === name;
-    return `<button class="row" data-v="${esc(name)}" aria-pressed="${!!on}">
-      <span class="name">${esc(name)}</span><span class="frac">${c.done + c.late}/${list.length} EA</span>
-      <span class="bar" role="img" aria-label="ส่งแล้ว ${c.done + c.late} จาก ${list.length}">${ORDER.filter(s => c[s]).map(s =>
-        `<i class="${s}" style="--n:${c[s]};--c:${ST[s].color}"></i>`).join('')}</span>
-      <span class="note">${late ? `<span>ส่งช้า ${late} ครั้ง</span>` : ''}${open ? `<span class="bad">ค้างส่ง ${open} วัน</span>` : ''}${!late && !open ? '<span>ไม่มีรายการส่งช้า</span>' : ''}</span></button>`;
-  }).join('') : '<p class="hint">ยังไม่มีข้อมูล</p>';
-  $(id).querySelectorAll('.row').forEach(b => b.onclick = () => {
-    const same = focus && focus.kind === kind && focus.value === b.dataset.v;
-    focus = same ? null : { kind, value: b.dataset.v };
-    if (kind === 'person') $('me').value = same ? '' : b.dataset.v;
-    render(); loadMe();
-  });
-}
-
-/* ---------- ข้อความลอย ---------- */
-function tip(el, x) {
-  const t = $('tip');
-  t.innerHTML = `<b>${esc(x.ea)}</b><br>${esc(x.person)}<br>${esc(x.project)}<br>${ST[x.status].label}` +
-    (x.status === 'overdue' ? ` ${x.overdue || 1} วัน` : '') + (x.late ? ` · ส่งช้า ${x.late} ครั้ง` : '');
-  const r = el.getBoundingClientRect();
-  t.style.left = Math.max(8, Math.min(innerWidth - 248, r.left + r.width / 2 - 100)) + 'px';
-  t.style.top = (r.bottom + 8 + 90 > innerHeight ? r.top - 98 : r.bottom + 8) + 'px';
-  t.classList.add('on');
-}
-
-/* ---------- แจ้งเตือนของฉัน ---------- */
-function syncMe() { $('me').value = ''; }
-$('me').onchange = () => { focus = $('me').value ? { kind:'person', value:$('me').value } : null; render(); loadMe(); };
-
-async function loadMe() {
-  const person = $('me').value, box = $('meBox');
-  if (!person) { box.hidden = true; return; }
-  let list = [];
-  try {
-    list = API ? (await (await fetch(API + '?person=' + encodeURIComponent(person))).json()).alerts
-               : (data.cells || []).filter(c => c.person === person && c.status === 'overdue')
-                   .map(c => ({ msg:'ค้างส่งงาน EA ' + c.ea + ' (' + c.project + ')' }));
-  } catch (e) { box.hidden = true; return; }
-  box.hidden = false;
-  box.className = 'me' + (list.length ? '' : ' clear');
-  box.innerHTML = list.length
-    ? `<p>${esc(person)} มี ${list.length} รายการค้างส่ง</p><ul>${list.map(a => `<li>${esc(a.msg)}</li>`).join('')}</ul>`
-    : `<p>${esc(person)} ส่งงานครบตามกำหนด ไม่มีรายการค้างส่ง</p>`;
-}
-
-initMonths(); load();
+function showNotice(msg, type='ok'){const n=$('notice');n.className='notice '+(type==='err'?'err':'ok');n.textContent=msg;window.scrollTo({top:0,behavior:'smooth'});setTimeout(()=>{n.className='notice';},7000);}
+function esc(v){return String(v==null?'':v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function callServer(name, payload){return new Promise((resolve,reject)=>{if(!window.google||!google.script||!google.script.run){reject(new Error('หน้านี้ยังไม่ได้เชื่อมกับ Google Apps Script Web App กรุณาเปิดผ่าน URL ที่ Deploy จาก Apps Script'));return;}const runner=google.script.run.withSuccessHandler(resolve).withFailureHandler(e=>reject(new Error(e&&e.message?e.message:String(e))));runner[name](payload);});}
+function callNoArgs(name){return new Promise((resolve,reject)=>{if(!window.google||!google.script||!google.script.run){reject(new Error('กรุณาเปิดหน้าเว็บผ่าน Apps Script Web App'));return;}const runner=google.script.run.withSuccessHandler(resolve).withFailureHandler(e=>reject(new Error(e&&e.message?e.message:String(e))));runner[name]();});}
+function fillSelect(el, values, placeholder){if(!el)return;const current=el.value;el.innerHTML='';if(placeholder!==null){const o=document.createElement('option');o.value='';o.textContent=placeholder||'— เลือก —';el.appendChild(o);}values.forEach(v=>{const o=document.createElement('option');o.value=v.value!==undefined?v.value:v;o.textContent=v.label!==undefined?v.label:v;el.appendChild(o);});if([...el.options].some(o=>o.value===current))el.value=current;}
+function populateMonths(){document.querySelectorAll('#filterMonth,#monthlyMonth,#dailyMonth').forEach(el=>{const all=el.id==='filterMonth';fillSelect(el,MONTHS.map(m=>({value:m,label:m})),all?'ทุกเดือน':'— เลือกเดือน —');});}
+function populateStatic(){document.querySelectorAll('.projectSelect').forEach(el=>fillSelect(el,APPDATA.projects,'— เลือกโครงการ —'));document.querySelectorAll('.peopleSelect').forEach(el=>fillSelect(el,[...new Set(APPDATA.eas.map(e=>e.Assignee).filter(Boolean))],'— เลือกผู้รับผิดชอบ —'));fillSelect($('reviewerSelect'),APPDATA.reviewers,'— เลือกผู้ตรวจ —');fillSelect($('approverSelect'),APPDATA.approvers,'— เลือกผู้อนุมัติ —');fillSelect($('progressStatus'),APPDATA.statuses,'— เลือกสถานะ —');fillSelect($('filterProject'),APPDATA.projects.map(p=>({value:p,label:p})),'ทุกโครงการ');fillSelect($('filterStatus'),APPDATA.statuses,'ทุกสถานะ');fillSelect($('filterPerson'),[...new Set(APPDATA.eas.map(e=>e.Assignee).filter(Boolean))],'ทุกคน');fillSelect($('filterWeek'),Array.from({length:53},(_,i)=>({value:String(i+1),label:'สัปดาห์ '+(i+1)})),'ทุกสัปดาห์');populateMonths();updateEADropdowns();}
+function updateEADropdowns(){document.querySelectorAll('.eaSelect').forEach(el=>{const form=el.closest('form');const p=form&&form.querySelector('[name="Project"]')?form.querySelector('[name="Project"]').value:'';const a=form&&form.querySelector('[name="Assignee"]')?form.querySelector('[name="Assignee"]').value:'';const eas=APPDATA.eas.filter(e=>(!p||e.Project===p)&&(!a||e.Assignee===a));fillSelect(el,eas.map(e=>({value:e.EA_ID,label:`EA ${e.EA} · ${e.Assignee} · ${e.Project}`})),'— เลือก EA จากทะเบียน —');});}
+function activateView(name){document.querySelectorAll('[id^="view-"]').forEach(el=>el.classList.add('hidden'));$('view-'+name).classList.remove('hidden');document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active',b.dataset.view===name));if(name==='dashboard')loadDashboard();if(name==='history')loadHistory();}
+document.querySelectorAll('.tab').forEach(b=>b.addEventListener('click',()=>activateView(b.dataset.view)));
+document.querySelectorAll('form').forEach(form=>{form.querySelectorAll('[name="Project"],[name="Assignee"]').forEach(el=>el.addEventListener('change',updateEADropdowns));});
+$('reviewStatus').addEventListener('change',()=>{const yes=$('reviewStatus').value==='ตรวจแล้ว';$('reviewerSelect').required=yes;$('reviewDate').required=yes;if(!yes){$('reviewerSelect').value='';$('reviewDate').value='';}});
+$('approvalStatus').addEventListener('change',()=>{const yes=$('approvalStatus').value==='อนุมัติแล้ว';$('approverSelect').required=yes;$('approvalDate').required=yes;if(!yes){$('approverSelect').value='';$('approvalDate').value='';}});
+$('progressStatus').addEventListener('change',()=>{$('completedDate').required=['เสร็จแล้ว','อนุมัติส่งงานแล้ว'].includes($('progressStatus').value);});
+$('monthlyForm').addEventListener('submit',async e=>{e.preventDefault();await submitForm(e.currentTarget,'saveMonthlyPlan');});
+$('dailyForm').addEventListener('submit',async e=>{e.preventDefault();await submitForm(e.currentTarget,'saveDailyUpdate');});
+$('eaForm').addEventListener('submit',async e=>{e.preventDefault();await submitForm(e.currentTarget,'saveEA');});
+async function submitForm(form, fn){const btn=form.querySelector('button[type="submit"]');btn.disabled=true;btn.textContent='กำลังบันทึก…';try{const data=Object.fromEntries(new FormData(form).entries());const result=await callServer(fn,data);showNotice(result.message||'บันทึกข้อมูลสำเร็จ');form.reset();await refreshAll();}catch(err){showNotice(err.message||String(err),'err');}finally{btn.disabled=false;btn.textContent=fn==='saveMonthlyPlan'?'บันทึกแผนรายเดือน':fn==='saveDailyUpdate'?'บันทึกผลรายวัน':'เพิ่ม EA ในทะเบียน';}}
+async function refreshAll(){try{APPDATA=await callNoArgs('getAppData');$('connectionText').textContent='เชื่อมต่อ Google Sheets แล้ว';populateStatic();renderMonthly();renderDaily();renderEA();await loadDashboard();}catch(err){$('connectionText').textContent='ยังไม่ได้เชื่อมต่อ';showNotice(err.message,'err');}}
+function getFilters(){return {fiscalYear:$('filterFY').value,month:$('filterMonth').value,week:$('filterWeek').value,assignee:$('filterPerson').value,project:$('filterProject').value,status:$('filterStatus').value};}
+async function loadDashboard(){try{DASH=await callServer('getDashboard',getFilters());renderDashboard();$('lastUpdated').textContent=' · อัปเดต '+DASH.updatedAt;}catch(err){$('metricCards').innerHTML='<div class="panel">'+esc(err.message)+'</div>';}}
+const metrics=[['total','EA ทั้งหมด','#17365d','ตามทะเบียน'],['inProgress','กำลังดำเนินการ','#2563eb','สถานะล่าสุด'],['waitingReview','รอตรวจ','#ea580c','รอตรวจงาน'],['reviewed','ตรวจแล้ว','#7e22ce','ผ่านการตรวจ'],['approved','อนุมัติส่งงานแล้ว','#15803d','อนุมัติแล้ว'],['remaining','คงเหลือ','#475569','ยังไม่เสร็จ'],['late','ล่าช้า','#b91c1c','เกินกำหนด'],['completed','เสร็จแล้ว','#0f766e','เสร็จ/อนุมัติ']];
+function renderDashboard(){if(!DASH)return;const s=DASH.summary;$('metricCards').innerHTML=metrics.map(([k,label,color,hint])=>`<div class="metric" style="--accent:${color}"><div class="label">${label}</div><div class="number">${Number(s[k]||0).toLocaleString('th-TH')}</div><div class="hint">${hint}</div></div>`).join('');renderBars('projectBars',DASH.projectSummary);renderBars('personBars',DASH.personSummary);$('dashboardRows').innerHTML=DASH.items.map(i=>`<tr><td>${esc(i.Assignee)}</td><td>${esc(i.Project)}</td><td><b>${esc(i.EA)}</b></td><td>${statusBadge(i.Status)}</td><td>${esc(i.DueDate)}</td><td>${esc(i.CompletedDate)}</td><td>${esc(i.ReviewStatus)}</td><td>${esc(i.Reviewer)}</td><td>${esc(i.ApprovalStatus)}</td><td style="font-weight:800;color:${i.DelayDays>0?'#b91c1c':'inherit'}">${Number(i.DelayDays||0)}</td><td>${esc(i.DelayReason||i.Notes)}</td></tr>`).join('')||'<tr><td colspan="11">ไม่มีข้อมูลตามตัวกรอง</td></tr>';}
+function renderBars(id,arr){const max=Math.max(1,...arr.map(x=>x.total));$(id).innerHTML=arr.map(x=>`<div class="barrow"><div class="barname" title="${esc(x.name)}">${esc(x.name)}</div><div class="bartrack"><div class="barfill" style="width:${Math.round(x.total/max*100)}%"></div></div><div class="barvalue">${x.completed}/${x.total}</div></div>`).join('')||'<p class="muted">ยังไม่มีข้อมูล</p>';}
+function statusBadge(s){let cls='s-not';if(s==='กำลังดำเนินการ')cls='s-progress';else if(s==='รอตรวจ')cls='s-review';else if(s==='ตรวจแล้ว')cls='s-reviewed';else if(s==='อนุมัติส่งงานแล้ว')cls='s-approved';else if(s==='เสร็จแล้ว')cls='s-done';else if(s==='ล่าช้า')cls='s-late';else if(s==='แก้ไขตามข้อเสนอแนะ')cls='s-edit';return `<span class="status ${cls}">${esc(s||'ไม่ระบุ')}</span>`;}
+function renderMonthly(){const rows=[...APPDATA.plans].reverse();$('monthlyRows').innerHTML=rows.map(p=>{const ea=APPDATA.eas.find(e=>e.EA_ID===p.EA_ID);return `<tr><td>${esc(p.Month)}</td><td>${esc(p.Assignee)}</td><td>${esc(p.Project)}</td><td>${esc(ea?ea.EA:p.EA_ID)}</td><td>${esc(p.StartDate)}</td><td>${esc(p.DueDate)}</td><td>${esc(p.FieldworkStart)} – ${esc(p.FieldworkEnd)}</td><td>${esc(p.MonthlyTask)}</td><td>${statusBadge(p.Status)}</td></tr>`}).join('')||'<tr><td colspan="9">ยังไม่มีแผนรายเดือน</td></tr>';}
+function renderDaily(){const rows=[...APPDATA.updates].reverse();$('dailyRows').innerHTML=rows.map(u=>{const ea=APPDATA.eas.find(e=>e.EA_ID===u.EA_ID);return `<tr><td>${esc(u.WorkDate)}</td><td>${esc(u.Assignee)}</td><td>${esc(u.Project)}</td><td>${esc(ea?ea.EA:u.EA_ID)}</td><td>${statusBadge(u.ProgressStatus)}</td><td>${esc(u.ReviewStatus)}</td><td>${esc(u.Reviewer)}</td><td>${esc(u.ApprovalStatus)}</td><td>${Number(u.DelayDays||0)}</td><td>${esc(u.DelayReason)}</td></tr>`}).join('')||'<tr><td colspan="10">ยังไม่มีรายการติดตามรายวัน</td></tr>';}
+function renderEA(){$('eaRows').innerHTML=[...APPDATA.eas].map(e=>`<tr><td>${esc(e.FiscalYear)}</td><td>${esc(e.Assignee)}</td><td>${esc(e.Project)}</td><td>${esc(e.PSU_NO)}</td><td><b>${esc(e.EA)}</b></td><td>${esc(e.District)}</td><td>${esc(e.Subdistrict)}</td><td>${esc(e.Village)}</td></tr>`).join('')||'<tr><td colspan="8">ยังไม่มีทะเบียน EA กรุณาเพิ่มข้อมูล</td></tr>';}
+async function loadHistory(){try{const rows=await callServer('getAuditHistory',100);$('historyRows').innerHTML=rows.map(r=>`<tr><td>${esc(r.Timestamp)}</td><td>${esc(r.Action)}</td><td>${esc(r.RecordType)}</td><td>${esc(r.RecordID)}</td><td>${esc(r.Actor)}</td><td style="max-width:420px;overflow-wrap:anywhere">${esc(r.Snapshot)}</td></tr>`).join('')||'<tr><td colspan="6">ยังไม่มีประวัติ</td></tr>';}catch(err){showNotice(err.message,'err');}}
+setInterval(()=>{if(!$('view-dashboard').classList.contains('hidden'))loadDashboard();},30000);
+refreshAll();
 </script>
 </body>
 </html>
