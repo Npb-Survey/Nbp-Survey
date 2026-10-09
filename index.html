@@ -3,204 +3,132 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>ติดตามงานโครงการ — สำนักงานสถิติจังหวัดหนองบัวลำภู</title>
+<title>สรุปงานรายเดือน | สำนักงานสถิติจังหวัดหนองบัวลำภู</title>
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#f3f7fc;--card:#fff;--tx:#0f2744;--mut:#5b6f8a;--bd:#d6e2f2;--pri:#1d4ed8;--sky:#38bdf8;--ok:#16a34a;--warn:#f59e0b;--bad:#dc2626}
-@media(prefers-color-scheme:dark){:root{--bg:#0b1626;--card:#12233b;--tx:#e6eefb;--mut:#93a8c6;--bd:#243b5c}}
-*{box-sizing:border-box}body{margin:0;font-family:"Sarabun","Noto Sans Thai",system-ui,sans-serif;background:var(--bg);color:var(--tx)}
-header{background:linear-gradient(120deg,#1e3a8a,#0ea5e9);color:#fff;padding:18px 16px}
-header h1{margin:0;font-size:1.25rem}header small{opacity:.85}
-.wrap{max-width:1200px;margin:0 auto;padding:12px}
-nav{display:flex;gap:6px;flex-wrap:wrap;margin:12px 0}
-nav button{border:1px solid var(--bd);background:var(--card);color:var(--tx);padding:8px 14px;border-radius:8px;cursor:pointer;font:inherit}
-nav button.on{background:var(--pri);color:#fff;border-color:var(--pri)}
-.grid{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}
-.card{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:12px}
-.kpi b{display:block;font-size:1.7rem}.kpi span{color:var(--mut);font-size:.85rem}
-.bar{height:10px;background:var(--bd);border-radius:6px;overflow:hidden;display:flex}
-.bar i{display:block;height:100%}.s-done{background:var(--ok)}.s-prog{background:var(--warn)}
-table{width:100%;border-collapse:collapse;font-size:.88rem}
-th,td{padding:7px 8px;border-bottom:1px solid var(--bd);text-align:left;white-space:nowrap}
-th{color:var(--mut);font-weight:600}.sc{overflow-x:auto}
-.tag{padding:2px 8px;border-radius:99px;font-size:.78rem;color:#fff}
-.t0{background:#94a3b8}.t1{background:var(--warn)}.t2{background:var(--ok)}
-h2{font-size:1.05rem;margin:18px 0 8px}
-form{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
-label{display:flex;flex-direction:column;font-size:.85rem;color:var(--mut);gap:3px}
-input,select,textarea{font:inherit;padding:8px;border:1px solid var(--bd);border-radius:8px;background:var(--card);color:var(--tx)}
-.full{grid-column:1/-1}.chk{flex-direction:row;align-items:center;gap:8px;color:var(--tx)}.chk input{width:auto}
-.btn{background:var(--pri);color:#fff;border:0;padding:10px 18px;border-radius:8px;cursor:pointer;font:inherit}
-.btn.g{background:transparent;color:var(--tx);border:1px solid var(--bd)}.btn.r{background:var(--bad)}
-#msg{margin:8px 0;padding:8px 12px;border-radius:8px;display:none}
-#msg.err{display:block;background:#fee2e2;color:#7f1d1d}#msg.ok{display:block;background:#dcfce7;color:#14532d}
-.live{font-size:.8rem}.live:before{content:"●";color:var(--ok);margin-right:4px}.live.off:before{color:var(--bad)}
-.pct{font-weight:700}
+  :root { --bg:#f5f6f8; --card:#fff; --text:#1d2433; --muted:#667085; --line:#e4e7ec;
+          --brand:#1f6feb; --ok:#12b76a; --warn:#f79009; --bad:#d92d20; }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg:#12161f; --card:#1b2130; --text:#e8ebf2; --muted:#98a2b3; --line:#2b3347; }
+  }
+  * { box-sizing:border-box; }
+  body { margin:0; font-family:'Sarabun',sans-serif; background:var(--bg); color:var(--text); }
+  header { padding:16px 20px; border-bottom:1px solid var(--line); background:var(--card); }
+  header h1 { margin:0; font-size:20px; }
+  header small { color:var(--muted); }
+  main { max-width:1000px; margin:0 auto; padding:16px; }
+  .bar { display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-bottom:14px; }
+  select, button { font:inherit; padding:8px 12px; border:1px solid var(--line); border-radius:8px;
+                   background:var(--card); color:var(--text); }
+  button.tab.active { background:var(--brand); color:#fff; border-color:var(--brand); }
+  .cards { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:10px; margin-bottom:14px; }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:12px 14px; }
+  .card .n { font-size:26px; font-weight:700; }
+  .card .l { color:var(--muted); font-size:14px; }
+  .alert { background:#fef3f2; color:#7a271a; border:1px solid #fda29b; border-radius:10px;
+           padding:10px 14px; margin-bottom:14px; }
+  @media (prefers-color-scheme: dark) { .alert { background:#3a1a17; color:#fecdca; border-color:#7a271a; } }
+  .tablewrap { overflow-x:auto; background:var(--card); border:1px solid var(--line); border-radius:12px; }
+  table { border-collapse:collapse; width:100%; min-width:640px; }
+  th, td { padding:10px 12px; text-align:right; border-bottom:1px solid var(--line); white-space:nowrap; }
+  th:first-child, td:first-child { text-align:left; }
+  th { color:var(--muted); font-weight:600; font-size:14px; }
+  .prog { display:inline-block; width:90px; height:8px; background:var(--line); border-radius:99px;
+          vertical-align:middle; margin-right:6px; overflow:hidden; }
+  .prog i { display:block; height:100%; background:var(--ok); }
+  .bad { color:var(--bad); font-weight:600; }
+  #note { color:var(--muted); font-size:13px; margin-top:10px; }
 </style>
 </head>
 <body>
-<header><div class="wrap" style="padding:0">
-<h1>ติดตามงานโครงการ — สำนักงานสถิติจังหวัดหนองบัวลำภู</h1>
-<small class="live" id="live">กำลังเชื่อมต่อ…</small></div></header>
-<div class="wrap">
-<nav id="nav"><button data-v="ov" class="on">ภาพรวมหน่วยงาน</button><button data-v="pp">รายบุคคล</button><button data-v="ls">รายการ EA</button><button data-v="in">บันทึกข้อมูล</button></nav>
-<div id="msg"></div>
-
-<section id="v-ov"></section>
-
-<section id="v-pp" hidden>
-<label style="max-width:300px;margin-bottom:10px">เลือกผู้รับผิดชอบ<select id="ppSel"></select></label>
-<div id="ppBody"></div>
-</section>
-
-<section id="v-ls" hidden>
-<div class="grid" style="margin-bottom:10px">
-<label>โครงการ<select id="fP"></select></label><label>ผู้รับผิดชอบ<select id="fS"></select></label>
-<label>สถานะ<select id="fT"><option value="">ทั้งหมด</option><option>ยังไม่เริ่ม</option><option>กำลังดำเนินการ</option><option>เสร็จแล้ว</option></select></label>
-</div>
-<div class="card sc" id="lsBody"></div>
-</section>
-
-<section id="v-in" hidden class="card">
-<h2 style="margin-top:0" id="formTitle">เพิ่มรายการ EA</h2>
-<form id="f" autocomplete="off">
-<input type="hidden" id="id">
-<label>ชื่อโครงการ *<input id="project" list="dlP" required></label>
-<label>ชื่อผู้รับผิดชอบ *<input id="staff" list="dlS" required></label>
-<label>รหัส EA *<input id="ea" inputmode="numeric" maxlength="4" placeholder="0013" required></label>
-<label>พื้นที่ (อำเภอ/ตำบล)<input id="area"></label>
-<label>ปริมาณงาน (ครัวเรือน) *<input id="total" type="number" min="1" required></label>
-<label>รวมข้อมูลได้<input id="collected" type="number" min="0" value="0"></label>
-<label>สถานะ *<select id="status"><option>ยังไม่เริ่ม</option><option>กำลังดำเนินการ</option><option>เสร็จแล้ว</option></select></label>
-<label>วันที่เริ่มดำเนินการ<input id="startDate" type="date"></label>
-<label>วันที่แล้วเสร็จ<input id="finishDate" type="date"></label>
-<label class="chk"><input id="checked" type="checkbox"> ตรวจแล้ว</label>
-<label>ชื่อผู้ตรวจ<input id="checker" list="dlS"></label>
-<label>วันที่ตรวจ<input id="checkDate" type="date"></label>
-<label class="chk"><input id="approved" type="checkbox"> อนุมัติส่งงานแล้ว</label>
-<label>วันที่อนุมัติ<input id="approveDate" type="date"></label>
-<label class="full">หมายเหตุ<textarea id="note" rows="2"></textarea></label>
-<label>ชื่อผู้บันทึก<input id="by"></label>
-<label>รหัสผ่านสำหรับบันทึก *<input id="pass" type="password"></label>
-<div class="full"><button class="btn" type="submit">บันทึก</button>
-<button class="btn g" type="button" id="reset">ล้างฟอร์ม</button>
-<button class="btn r" type="button" id="del" hidden>ลบรายการ</button></div>
-</form>
-<datalist id="dlP"></datalist><datalist id="dlS"></datalist>
-</section>
-</div>
-
+<header>
+  <h1>สรุปงานรายเดือน</h1>
+  <small>สำนักงานสถิติจังหวัดหนองบัวลำภู · ติดตามงานรายบุคคลและรายโครงการ</small>
+</header>
+<main>
+  <div class="bar">
+    <select id="month" aria-label="เลือกเดือน"></select>
+    <button class="tab active" data-v="persons">รายบุคคล</button>
+    <button class="tab" data-v="projects">รายโครงการ</button>
+    <select id="me" aria-label="เลือกชื่อของฉัน"><option value="">แจ้งเตือนของฉัน: เลือกชื่อ</option></select>
+  </div>
+  <div id="alerts"></div>
+  <div class="cards" id="cards"></div>
+  <div class="tablewrap"><table id="tbl"></table></div>
+  <div id="note"></div>
+</main>
 <script>
-/* ===== ตั้งค่า: ใส่ URL ของ Web App (Deploy จาก Apps Script) ===== */
-const API_URL = "https://script.google.com/macros/s/AKfycbxj_Sp1-s4dpY9ErfBzlE-C2eTSKW2iLBumkCo51BcXAchmBCAYYEZIHqCnxocKojNF/exec";
-const REFRESH_MS = 15000;
-/* ================================================================= */
-let rows = [], view = "ov";
+// ใส่ URL ของ Web app (Apps Script) ที่ Deploy แล้ว ถ้าเว้นว่างจะแสดงข้อมูลตัวอย่าง
+const API = '';
+
+const THAI_MONTHS = ['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน',
+  'กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
+let view = 'persons', data = null;
 const $ = id => document.getElementById(id);
-const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
-const uniq = k => [...new Set(rows.map(r => r[k]).filter(Boolean))].sort((a,b)=>a.localeCompare(b,"th"));
-const thDate = s => { if(!s) return "-"; const [y,m,d]=s.slice(0,10).split("-"); return `${+d}/${+m}/${+y+543}`; };
-const pct = (a,b) => b ? Math.round(a*100/b) : 0;
-const tag = s => `<span class="tag t${["ยังไม่เริ่ม","กำลังดำเนินการ","เสร็จแล้ว"].indexOf(s)}">${esc(s)}</span>`;
 
-function show(t,type){const m=$("msg");m.className=type;m.innerHTML=Array.isArray(t)?t.map(esc).join("<br>"):esc(t);if(type==="ok")setTimeout(()=>m.className="",4000)}
+const DEMO = month => ({ month, label:'ข้อมูลตัวอย่าง',
+  total:{planned:20,done:13,remaining:7,pct:65,late:3,overdue:2},
+  persons:[{name:'สมชาย ใจดี',planned:8,done:6,remaining:2,pct:75,late:1,overdue:0},
+           {name:'สมหญิง รักงาน',planned:12,done:7,remaining:5,pct:58,late:2,overdue:2}],
+  projects:[{name:'สำรวจแรงงาน',planned:10,done:7,remaining:3,pct:70,late:1,overdue:1},
+            {name:'สำรวจการย้ายถิ่น',planned:6,done:4,remaining:2,pct:67,late:1,overdue:1},
+            {name:'สำรวจ ICT ครัวเรือน',planned:4,done:2,remaining:2,pct:50,late:1,overdue:0}] });
 
-async function load(){
-  try{
-    const r = await fetch(API_URL+"?action=list&t="+Date.now());
-    const j = await r.json(); if(!j.ok) throw 0;
-    rows = j.rows; $("live").className="live";
-    $("live").textContent = "เชื่อมต่อแล้ว • อัปเดตล่าสุด "+new Date().toLocaleTimeString("th-TH");
-    render();
-  }catch(e){$("live").className="live off";$("live").textContent="เชื่อมต่อไม่ได้ — ตรวจสอบ API_URL / การ Deploy"}
+function initMonths() {
+  const now = new Date(), sel = $('month');
+  for (let i = 0; i < 12; i++) {
+    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    const key = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
+    sel.add(new Option(THAI_MONTHS[d.getMonth()] + ' ' + (d.getFullYear() + 543), key));
+  }
 }
 
-/* ---- สรุปตัวเลข ---- */
-function stat(list){
-  const s={n:list.length,done:0,prog:0,todo:0,chk:0,appr:0,tot:0,col:0};
-  list.forEach(r=>{ if(r.status==="เสร็จแล้ว")s.done++; else if(r.status==="กำลังดำเนินการ")s.prog++; else s.todo++;
-    if(r.checked)s.chk++; if(r.approved)s.appr++; s.tot+=+r.total||0; s.col+=+r.collected||0; });
-  s.rem=s.n-s.done; return s;
-}
-const bar = s => `<div class="bar" title="เสร็จ ${s.done} / กำลังทำ ${s.prog} / ยังไม่เริ่ม ${s.todo}"><i class="s-done" style="width:${pct(s.done,s.n)}%"></i><i class="s-prog" style="width:${pct(s.prog,s.n)}%"></i></div>`;
-
-function sumTable(keyFn, label){
-  const g={}; rows.forEach(r=>(g[keyFn(r)]??=[]).push(r));
-  return `<div class="card sc"><table><tr><th>${label}</th><th>EA ทั้งหมด</th><th>เสร็จแล้ว</th><th>กำลังดำเนินการ</th><th>คงเหลือ</th><th>ตรวจแล้ว</th><th>อนุมัติส่งงาน</th><th style="min-width:130px">ความก้าวหน้า</th></tr>`+
-  Object.keys(g).sort((a,b)=>a.localeCompare(b,"th")).map(k=>{const s=stat(g[k]);
-    return `<tr><td>${esc(k)}</td><td>${s.n}</td><td>${s.done}</td><td>${s.prog}</td><td>${s.rem}</td><td>${s.chk}/${s.done}</td><td>${s.appr}</td><td>${bar(s)}<span class="pct">${pct(s.done,s.n)}%</span></td></tr>`}).join("")+`</table></div>`;
+async function load() {
+  const month = $('month').value;
+  $('note').textContent = 'กำลังโหลด…';
+  try {
+    data = API ? await (await fetch(API + '?action=summary&month=' + month)).json() : DEMO(month);
+    $('note').textContent = API ? '' : 'ยังไม่ได้ใส่ URL ของ Apps Script จึงแสดงข้อมูลตัวอย่าง';
+  } catch (e) { $('note').textContent = 'โหลดข้อมูลไม่สำเร็จ: ' + e.message; return; }
+  const me = $('me'), keep = me.value;
+  me.length = 1;
+  data.persons.forEach(p => me.add(new Option(p.name, p.name)));
+  me.value = keep;
+  render(); loadAlerts();
 }
 
-function renderOv(){
-  const s=stat(rows);
-  const k=(b,l)=>`<div class="card kpi"><b>${b}</b><span>${l}</span></div>`;
-  $("v-ov").innerHTML = `<div class="grid">${k(s.n,"EA ทั้งหมด")}${k(s.done,"เสร็จแล้ว")}${k(s.prog,"กำลังดำเนินการ")}${k(s.rem,"คงเหลือ")}${k(s.chk+"/"+s.done,"ตรวจแล้ว (จากที่เสร็จ)")}${k(s.appr,"อนุมัติส่งงานแล้ว")}${k(pct(s.done,s.n)+"%","ความก้าวหน้ารวม")}${k(s.col.toLocaleString()+"/"+s.tot.toLocaleString(),"ครัวเรือนที่ได้ข้อมูล")}</div>
-  <h2>แยกตามโครงการ</h2>${sumTable(r=>r.project,"โครงการ")}
-  <h2>แยกตามผู้รับผิดชอบ</h2>${sumTable(r=>r.staff,"ผู้รับผิดชอบ")}`;
+function render() {
+  const t = data.total;
+  $('cards').innerHTML = [['EA ตามแผน', t.planned], ['ส่งแล้ว', t.done], ['คงเหลือ', t.remaining],
+    ['ความคืบหน้า', t.pct + '%'], ['ส่งช้า (ครั้ง)', t.late], ['ค้างส่ง (วัน)', t.overdue]]
+    .map(([l, n]) => `<div class="card"><div class="n">${n}</div><div class="l">${l}</div></div>`).join('');
+  const rows = data[view].map(o => `<tr><td>${o.name}</td><td>${o.planned}</td><td>${o.done}</td>
+    <td>${o.remaining}</td><td><span class="prog"><i style="width:${o.pct}%"></i></span>${o.pct}%</td>
+    <td>${o.late}</td><td class="${o.overdue ? 'bad' : ''}">${o.overdue}</td></tr>`).join('');
+  $('tbl').innerHTML = `<tr><th>${view === 'persons' ? 'ผู้รับผิดชอบ' : 'โครงการ'}</th><th>EA ตามแผน</th>
+    <th>ส่งแล้ว</th><th>คงเหลือ</th><th>ความคืบหน้า</th><th>ส่งช้า</th><th>ค้างส่ง (วัน)</th></tr>` +
+    (rows || '<tr><td colspan="7">ยังไม่มีแผนงานของเดือนนี้</td></tr>');
 }
 
-function renderPp(){
-  const sel=$("ppSel"), cur=sel.value, staff=uniq("staff");
-  sel.innerHTML=staff.map(x=>`<option>${esc(x)}</option>`).join(""); if(staff.includes(cur))sel.value=cur;
-  const list=rows.filter(r=>r.staff===sel.value), s=stat(list);
-  if(!list.length){$("ppBody").innerHTML='<div class="card">ยังไม่มีข้อมูล</div>';return}
-  const k=(b,l)=>`<div class="card kpi"><b>${b}</b><span>${l}</span></div>`;
-  $("ppBody").innerHTML=`<div class="grid">${k(s.n,"EA ที่รับผิดชอบ")}${k(s.done,"เสร็จแล้ว")}${k(s.prog,"กำลังดำเนินการ")}${k(s.rem,"คงเหลือ")}${k(s.chk,"ตรวจแล้ว")}${k(s.appr,"อนุมัติส่งงาน")}${k(pct(s.done,s.n)+"%","ความก้าวหน้า")}</div>
-  <h2>รายละเอียดแต่ละ EA</h2><div class="card sc">${eaTable(list)}</div>`;
+async function loadAlerts() {
+  const person = $('me').value, box = $('alerts');
+  box.innerHTML = '';
+  if (!person) return;
+  let list = [];
+  try {
+    list = API ? (await (await fetch(API + '?person=' + encodeURIComponent(person))).json()).alerts
+               : (person === 'สมหญิง รักงาน' ? [{date:'8 ตุลาคม 2569', ea:'EA-0123', msg:'ค้างส่งงานประจำวันที่ 8 ตุลาคม 2569'}] : []);
+  } catch (e) { return; }
+  if (list.length) box.innerHTML = `<div class="alert"><b>คุณมี ${list.length} รายการค้างส่ง</b><br>` +
+    list.map(a => `• ${a.msg}`).join('<br>') + '</div>';
 }
 
-function eaTable(list){
-  return `<table><tr><th>โครงการ</th><th>EA</th><th>พื้นที่</th><th>ปริมาณงาน</th><th>ได้ข้อมูล</th><th>สถานะ</th><th>เริ่ม</th><th>แล้วเสร็จ</th><th>ตรวจ</th><th>อนุมัติ</th><th></th></tr>`+
-  list.map(r=>`<tr><td>${esc(r.project)}</td><td>${esc(r.ea)}</td><td>${esc(r.area)}</td><td>${r.total}</td><td>${r.collected}</td><td>${tag(r.status)}</td><td>${thDate(r.startDate)}</td><td>${thDate(r.finishDate)}</td>
-  <td>${r.checked?"✔ "+esc(r.checker)+" ("+thDate(r.checkDate)+")":"ยังไม่ตรวจ"}</td><td>${r.approved?"✔ "+thDate(r.approveDate):"-"}</td>
-  <td><button class="btn g" onclick="edit('${r.id}')">แก้ไข</button></td></tr>`).join("")+`</table>`;
-}
-
-function fillSel(id,vals,all){const e=$(id),c=e.value;e.innerHTML=(all?'<option value="">ทั้งหมด</option>':"")+vals.map(v=>`<option>${esc(v)}</option>`).join("");e.value=vals.includes(c)?c:""}
-function renderLs(){
-  fillSel("fP",uniq("project"),1);fillSel("fS",uniq("staff"),1);
-  const p=$("fP").value,s=$("fS").value,t=$("fT").value;
-  const list=rows.filter(r=>(!p||r.project===p)&&(!s||r.staff===s)&&(!t||r.status===t));
-  $("lsBody").innerHTML=list.length?eaTable(list):"ไม่พบรายการ";
-}
-function render(){
-  $("dlP").innerHTML=uniq("project").map(v=>`<option value="${esc(v)}">`).join("");
-  $("dlS").innerHTML=uniq("staff").map(v=>`<option value="${esc(v)}">`).join("");
-  if(view==="ov")renderOv(); if(view==="pp")renderPp(); if(view==="ls")renderLs();
-}
-
-/* ---- แท็บ ---- */
-$("nav").onclick=e=>{const v=e.target.dataset.v;if(!v)return;view=v;
-  [...$("nav").children].forEach(b=>b.classList.toggle("on",b===e.target));
-  ["ov","pp","ls","in"].forEach(x=>$("v-"+x).hidden=x!==v);render()};
-["ppSel","fP","fS","fT"].forEach(i=>$(i).onchange=render);
-
-/* ---- ฟอร์ม ---- */
-const F=["id","project","staff","ea","area","total","collected","status","startDate","finishDate","checker","checkDate","approveDate","note"];
-$("pass").value=sessionStorage.getItem("pw")||""; $("by").value=sessionStorage.getItem("by")||"";
-function resetForm(){F.forEach(k=>$(k).value="");$("collected").value=0;$("status").value="ยังไม่เริ่ม";$("checked").checked=$("approved").checked=false;
-  $("formTitle").textContent="เพิ่มรายการ EA";$("del").hidden=true}
-$("reset").onclick=resetForm;
-window.edit=id=>{const r=rows.find(x=>x.id===id);if(!r)return;
-  F.forEach(k=>$(k).value=r[k]??"");$("checked").checked=!!r.checked;$("approved").checked=!!r.approved;
-  $("formTitle").textContent="แก้ไขรายการ "+r.id;$("del").hidden=false;
-  document.querySelector('[data-v="in"]').click();scrollTo(0,0)};
-async function post(body){
-  const r=await fetch(API_URL,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(body)});
-  return r.json();
-}
-$("f").onsubmit=async e=>{e.preventDefault();
-  const row={};F.forEach(k=>row[k]=$(k).value.trim());row.checked=$("checked").checked;row.approved=$("approved").checked;
-  sessionStorage.setItem("pw",$("pass").value);sessionStorage.setItem("by",$("by").value);
-  try{const j=await post({action:"save",passcode:$("pass").value,by:$("by").value,row});
-    if(!j.ok)return show(j.errors,"err");
-    rows=j.rows;show("บันทึกเรียบร้อย","ok");resetForm();render()}
-  catch(x){show("ส่งข้อมูลไม่สำเร็จ ตรวจสอบ API_URL","err")}};
-$("del").onclick=async()=>{if(!confirm("ยืนยันการลบรายการนี้?"))return;
-  try{const j=await post({action:"delete",passcode:$("pass").value,by:$("by").value,id:$("id").value});
-    if(!j.ok)return show(j.errors,"err");rows=j.rows;show("ลบแล้ว","ok");resetForm();render()}
-  catch(x){show("ลบไม่สำเร็จ","err")}};
-
-load();setInterval(()=>{if(view!=="in"||!document.activeElement.closest("form"))load()},REFRESH_MS);
+document.querySelectorAll('.tab').forEach(b => b.onclick = () => {
+  document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
+  b.classList.add('active'); view = b.dataset.v; if (data) render();
+});
+$('month').onchange = load; $('me').onchange = loadAlerts;
+initMonths(); load();
 </script>
 </body>
 </html>
