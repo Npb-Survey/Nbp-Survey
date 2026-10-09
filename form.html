@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>กรอกข้อมูล | สำนักงานสถิติจังหวัดหนองบัวลำภู</title>
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root { --bg:#f5f6f8; --card:#fff; --text:#1d2433; --muted:#667085; --line:#d0d5dd;
+          --brand:#1f6feb; --ok:#067647; --bad:#d92d20; }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg:#12161f; --card:#1b2130; --text:#e8ebf2; --muted:#98a2b3; --line:#2b3347; --ok:#47cd89; }
+  }
+  * { box-sizing:border-box; }
+  body { margin:0; font-family:'Sarabun',sans-serif; background:var(--bg); color:var(--text); }
+  main { max-width:520px; margin:0 auto; padding:16px; }
+  h1 { font-size:20px; margin:8px 0 2px; }
+  p.sub { color:var(--muted); margin:0 0 14px; }
+  .tabs { display:flex; gap:8px; margin-bottom:12px; }
+  .tabs button { margin:0; background:var(--card); color:var(--text); border-color:var(--line); }
+  .tabs button.active { background:var(--brand); color:#fff; border-color:var(--brand); }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:16px; }
+  .pane { display:none; } .pane.active { display:block; }
+  label { display:block; font-weight:600; margin:12px 0 4px; }
+  select, input, textarea, button { width:100%; font:inherit; padding:10px 12px; border:1px solid var(--line);
+    border-radius:8px; background:var(--card); color:var(--text); }
+  button.go { background:var(--brand); color:#fff; border-color:var(--brand); margin-top:16px; font-weight:600; cursor:pointer; }
+  button:disabled { opacity:.6; cursor:wait; }
+  .row { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  .msg { margin-top:12px; padding:10px 12px; border-radius:8px; display:none; }
+  .msg.ok { display:block; background:#ecfdf3; color:var(--ok); }
+  .msg.err { display:block; background:#fef3f2; color:var(--bad); }
+  .hint { color:var(--muted); font-size:13px; margin-top:4px; }
+  a { color:var(--brand); }
+</style>
+</head>
+<body>
+<main>
+  <h1>กรอกข้อมูล</h1>
+  <p class="sub">สำนักงานสถิติจังหวัดหนองบัวลำภู · <a href="index.html">ดูสรุปรายเดือน</a></p>
+
+  <div class="tabs">
+    <button class="active" data-p="daily">ส่งงานรายวัน</button>
+    <button data-p="plan">กำหนดแผนรายเดือน</button>
+  </div>
+
+  <!-- ส่งงานรายวัน -->
+  <div class="card pane active" id="daily">
+    <label for="person">ผู้รับผิดชอบ</label>
+    <select id="person"><option value="">เลือกชื่อ</option></select>
+
+    <label for="ea">รหัส EA (ตามแผนของเดือนนี้)</label>
+    <select id="ea" disabled><option value="">เลือกผู้รับผิดชอบก่อน</option></select>
+    <div class="hint" id="win"></div>
+
+    <label for="count">จำนวนที่ทำได้วันนี้</label>
+    <input id="count" type="number" min="0" inputmode="numeric">
+
+    <label for="note">หมายเหตุ (ถ้ามี)</label>
+    <textarea id="note" rows="2"></textarea>
+
+    <button class="go" id="send">ส่งงานวันนี้</button>
+    <div class="msg" id="msg" role="status"></div>
+  </div>
+
+  <!-- กำหนดแผนรายเดือน (ต้นเดือน) -->
+  <div class="card pane" id="plan">
+    <label for="pmonth">เดือน</label>
+    <select id="pmonth"></select>
+
+    <label for="pperson">ผู้รับผิดชอบ</label>
+    <input id="pperson" list="people" placeholder="พิมพ์หรือเลือกชื่อ (ต้องสะกดตรงกันทุกเดือน)">
+    <datalist id="people"></datalist>
+
+    <label for="pproject">โครงการ</label>
+    <input id="pproject" placeholder="เช่น สำรวจแรงงาน">
+
+    <label for="peas">รหัส EA (หนึ่งบรรทัดต่อหนึ่ง EA หรือคั่นด้วยจุลภาค)</label>
+    <textarea id="peas" rows="4"></textarea>
+    <div class="hint">EA ต้องมีอยู่ในระบบหลักก่อน มิฉะนั้นระบบจะข้ามให้</div>
+
+    <div class="row">
+      <div><label for="pfrom">เริ่มลงพื้นที่</label><input id="pfrom" type="date"></div>
+      <div><label for="pto">สิ้นสุดลงพื้นที่</label><input id="pto" type="date"></div>
+    </div>
+
+    <label for="pdead">กำหนดส่ง (ถ้ามี)</label>
+    <input id="pdead" type="date">
+
+    <label for="ppin">รหัสผู้ดูแล</label>
+    <input id="ppin" type="password" autocomplete="off">
+
+    <button class="go" id="psend">บันทึกแผนรายเดือน</button>
+    <div class="msg" id="pmsg" role="status"></div>
+  </div>
+</main>
+<script>
+// ใส่ URL ของ Web app (Apps Script) เดียวกับหน้า index.html
+const API = '';
+const THAI_MONTHS = ['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน',
+  'กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
+const $ = id => document.getElementById(id);
+let plan = [];
+
+function show(id, text, ok) { const m = $(id); m.textContent = text; m.className = 'msg ' + (ok ? 'ok' : 'err'); }
+const post = body => fetch(API, { method:'POST', headers:{'Content-Type':'text/plain;charset=utf-8'},
+  body: JSON.stringify(body) }).then(r => r.json());   // text/plain เลี่ยง preflight ของ CORS
+
+document.querySelectorAll('.tabs button').forEach(b => b.onclick = () => {
+  document.querySelectorAll('.tabs button').forEach(x => x.classList.remove('active'));
+  document.querySelectorAll('.pane').forEach(x => x.classList.remove('active'));
+  b.classList.add('active'); $(b.dataset.p).classList.add('active');
+});
+
+async function init() {
+  // เดือนสำหรับกำหนดแผน: เดือนนี้และ 2 เดือนถัดไป
+  const now = new Date();
+  for (let i = 0; i < 3; i++) {
+    const d = new Date(now.getFullYear(), now.getMonth() + i, 1);
+    $('pmonth').add(new Option(THAI_MONTHS[d.getMonth()] + ' ' + (d.getFullYear() + 543),
+      d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0')));
+  }
+  if (!API) { show('msg', 'ยังไม่ได้ใส่ URL ของ Apps Script ในตัวแปร API', false); return; }
+  const month = $('pmonth').options[0].value;
+  const s = await (await fetch(API + '?action=summary&month=' + month)).json();
+  s.persons.forEach(p => $('person').add(new Option(p.name, p.name)));
+  const pp = await (await fetch(API + '?action=people')).json();
+  pp.people.forEach(n => $('people').appendChild(new Option(n)));
+}
+
+$('person').onchange = async () => {
+  const ea = $('ea'); ea.length = 1; $('win').textContent = '';
+  if (!$('person').value) { ea.disabled = true; return; }
+  const r = await (await fetch(API + '?action=myplan&person=' + encodeURIComponent($('person').value))).json();
+  plan = r.plan;
+  plan.forEach(p => ea.add(new Option(p.ea + ' · ' + p.project + (p.inWindow ? '' : ' (ไม่อยู่ในช่วงลงพื้นที่วันนี้)'), p.ea)));
+  ea.disabled = false; ea.options[0].text = plan.length ? 'เลือก EA' : 'ไม่มีแผนของเดือนนี้';
+};
+
+$('ea').onchange = () => {
+  const p = plan.find(x => x.ea === $('ea').value);
+  $('win').textContent = p ? 'ช่วงลงพื้นที่: ' + p.from + ' – ' + p.to : '';
+};
+
+$('send').onclick = async () => {
+  if (!$('person').value || !$('ea').value || $('count').value === '') { show('msg', 'กรุณากรอกข้อมูลให้ครบ', false); return; }
+  $('send').disabled = true;
+  try {
+    const j = await post({ person:$('person').value, ea:$('ea').value, count:+$('count').value, note:$('note').value });
+    show('msg', j.msg, j.ok);
+    if (j.ok) { $('count').value = ''; $('note').value = ''; }
+  } catch (e) { show('msg', 'ส่งไม่สำเร็จ: ' + e.message, false); }
+  $('send').disabled = false;
+};
+
+$('psend').onclick = async () => {
+  const eas = $('peas').value.split(/[\n,]+/).map(x => x.trim()).filter(Boolean);
+  if (!$('pperson').value.trim() || !$('pproject').value.trim() || !eas.length || !$('pfrom').value || !$('pto').value) {
+    show('pmsg', 'กรุณากรอกข้อมูลให้ครบ', false); return;
+  }
+  $('psend').disabled = true;
+  try {
+    const j = await post({ action:'addPlan', pin:$('ppin').value, month:$('pmonth').value,
+      person:$('pperson').value.trim(), project:$('pproject').value.trim(), eas,
+      from:$('pfrom').value, to:$('pto').value, deadline:$('pdead').value });
+    show('pmsg', j.msg, j.ok);
+    if (j.ok) $('peas').value = '';
+  } catch (e) { show('pmsg', 'ส่งไม่สำเร็จ: ' + e.message, false); }
+  $('psend').disabled = false;
+};
+init().catch(e => show('msg', 'โหลดข้อมูลไม่สำเร็จ: ' + e.message, false));
+</script>
+</body>
+</html>

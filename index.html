@@ -3,131 +3,281 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>สรุปงานรายเดือน | สำนักงานสถิติจังหวัดหนองบัวลำภู</title>
-<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700&display=swap" rel="stylesheet">
+<title>ติดตามงานสำรวจรายเดือน | สำนักงานสถิติจังหวัดหนองบัวลำภู</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600&family=Noto+Serif+Thai:wght@600;700&display=swap" rel="stylesheet">
 <style>
-  :root { --bg:#f5f6f8; --card:#fff; --text:#1d2433; --muted:#667085; --line:#e4e7ec;
-          --brand:#1f6feb; --ok:#12b76a; --warn:#f79009; --bad:#d92d20; }
+  :root {
+    --paper:#F3F4F0; --ink:#16212E; --muted:#5E6B75; --rule:#D9DDD6; --navy:#1F3A5F;
+    --done:#2A9D78; --late:#E3A21A; --overdue:#D1432F; --pending:#CDD3CB; --pending-edge:#AEB6AD;
+    --band:#FBE9E5; --good:#E2F2EB;
+    --sans:'IBM Plex Sans Thai','Noto Sans Thai',system-ui,sans-serif;
+    --serif:'Noto Serif Thai','Noto Serif',Georgia,serif;
+  }
   @media (prefers-color-scheme: dark) {
-    :root { --bg:#12161f; --card:#1b2130; --text:#e8ebf2; --muted:#98a2b3; --line:#2b3347; }
+    :root { --paper:#121A22; --ink:#E8ECE9; --muted:#9AA7B0; --rule:#26323D; --navy:#8FB0DA;
+      --done:#3DB892; --late:#EDB43A; --overdue:#E8624F; --pending:#2B3844; --pending-edge:#3C4B59;
+      --band:#3A1E1A; --good:#16302A; }
   }
   * { box-sizing:border-box; }
-  body { margin:0; font-family:'Sarabun',sans-serif; background:var(--bg); color:var(--text); }
-  header { padding:16px 20px; border-bottom:1px solid var(--line); background:var(--card); }
-  header h1 { margin:0; font-size:20px; }
-  header small { color:var(--muted); }
-  main { max-width:1000px; margin:0 auto; padding:16px; }
-  .bar { display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-bottom:14px; }
-  select, button { font:inherit; padding:8px 12px; border:1px solid var(--line); border-radius:8px;
-                   background:var(--card); color:var(--text); }
-  button.tab.active { background:var(--brand); color:#fff; border-color:var(--brand); }
-  .cards { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:10px; margin-bottom:14px; }
-  .card { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:12px 14px; }
-  .card .n { font-size:26px; font-weight:700; }
-  .card .l { color:var(--muted); font-size:14px; }
-  .alert { background:#fef3f2; color:#7a271a; border:1px solid #fda29b; border-radius:10px;
-           padding:10px 14px; margin-bottom:14px; }
-  @media (prefers-color-scheme: dark) { .alert { background:#3a1a17; color:#fecdca; border-color:#7a271a; } }
-  .tablewrap { overflow-x:auto; background:var(--card); border:1px solid var(--line); border-radius:12px; }
-  table { border-collapse:collapse; width:100%; min-width:640px; }
-  th, td { padding:10px 12px; text-align:right; border-bottom:1px solid var(--line); white-space:nowrap; }
-  th:first-child, td:first-child { text-align:left; }
-  th { color:var(--muted); font-weight:600; font-size:14px; }
-  .prog { display:inline-block; width:90px; height:8px; background:var(--line); border-radius:99px;
-          vertical-align:middle; margin-right:6px; overflow:hidden; }
-  .prog i { display:block; height:100%; background:var(--ok); }
-  .bad { color:var(--bad); font-weight:600; }
-  #note { color:var(--muted); font-size:13px; margin-top:10px; }
+  html { -webkit-text-size-adjust:100%; }
+  body { margin:0; background:var(--paper); color:var(--ink); font-family:var(--sans); font-size:16px; line-height:1.6; }
+  button { font:inherit; color:inherit; }
+  :focus-visible { outline:2px solid var(--navy); outline-offset:2px; }
+  .wrap { max-width:1080px; margin:0 auto; padding:0 20px; }
+
+  /* ส่วนหัว */
+  .top { display:flex; justify-content:space-between; align-items:center; gap:16px; padding:18px 0 14px; flex-wrap:wrap; }
+  .brand { display:flex; align-items:center; gap:12px; }
+  .mark { display:grid; grid-template-columns:repeat(3,8px); gap:2px; }
+  .mark i { width:8px; height:8px; border-radius:2px; background:var(--done); }
+  .mark i:nth-child(2n) { background:var(--navy); } .mark i:nth-child(4) { background:var(--late); }
+  .mark i:nth-child(7) { background:var(--overdue); } .mark i:nth-child(5) { background:var(--pending-edge); }
+  .brand b { display:block; font-weight:600; line-height:1.3; }
+  .brand span { display:block; color:var(--muted); font-size:14px; line-height:1.3; }
+  .tools { display:flex; gap:12px; align-items:center; flex-wrap:wrap; }
+  .tools a { color:var(--navy); font-weight:500; }
+  select { font:inherit; padding:7px 10px; border:1px solid var(--rule); border-radius:6px; background:var(--paper); color:var(--ink); max-width:100%; }
+
+  .months { display:flex; gap:6px; overflow-x:auto; padding:4px 0 6px; border-top:1px solid var(--rule); padding-top:12px; }
+  .months button { flex:none; padding:5px 13px; border:1px solid var(--rule); border-radius:6px; background:transparent; cursor:pointer; }
+  .months button[aria-pressed="true"] { background:var(--navy); border-color:var(--navy); color:var(--paper); }
+
+  .demo { margin-top:10px; padding:8px 12px; border-left:3px solid var(--late); background:var(--good); font-size:14px; }
+  .demo[hidden], .me[hidden], .empty[hidden] { display:none; }
+
+  /* หัวเรื่องและสถานะ */
+  h1 { font-family:var(--serif); font-weight:700; font-size:clamp(26px,4.4vw,42px); line-height:1.35; margin:28px 0 20px; max-width:22em; }
+  .legend { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:10px 24px; margin:0 0 8px; }
+  .legend button { display:grid; grid-template-columns:auto 1fr; column-gap:10px; align-items:center; text-align:left;
+    background:none; border:0; padding:6px 0; cursor:pointer; border-bottom:2px solid transparent; }
+  .legend button[aria-pressed="true"] { border-bottom-color:var(--ink); }
+  .sw { grid-row:span 2; width:14px; height:44px; border-radius:3px; background:var(--c); }
+  .sw.pending { box-shadow:inset 0 0 0 1.5px var(--pending-edge); }
+  .legend .n { font-family:var(--serif); font-weight:700; font-size:26px; line-height:1.15; }
+  .legend .l { color:var(--muted); font-size:14px; line-height:1.3; }
+  .hint { color:var(--muted); font-size:13px; margin:0 0 4px; }
+
+  /* แจ้งเตือนของฉัน */
+  .me { margin:18px 0 0; padding:14px 16px; background:var(--band); border-left:4px solid var(--overdue); }
+  .me.clear { background:var(--good); border-left-color:var(--done); }
+  .me p { margin:0; font-weight:600; } .me ul { margin:6px 0 0; padding-left:18px; }
+
+  /* แผนที่ EA */
+  .map { margin-top:8px; }
+  .group { margin-top:20px; }
+  .group h3 { margin:0 0 8px; font-size:15px; font-weight:600; display:flex; gap:10px; align-items:baseline; }
+  .group h3 span { color:var(--muted); font-weight:400; font-size:14px; }
+  .tiles { display:flex; flex-wrap:wrap; gap:5px; }
+  .tile { --t:clamp(24px,3.4vw,32px); width:var(--t); height:var(--t); padding:0; border:0; border-radius:4px;
+    background:var(--c); cursor:pointer; transition:opacity .2s;
+    animation:pop .4s backwards; animation-delay:calc(var(--i) * 14ms); }
+  .tile.pending { box-shadow:inset 0 0 0 1.5px var(--pending-edge); background:var(--pending); }
+  .tile.dim { opacity:.16; }
+  @keyframes pop { from { opacity:0; transform:scale(.55); } }
+  .empty { margin:28px 0; padding:20px; border:1px dashed var(--pending-edge); }
+  .empty a { color:var(--navy); font-weight:500; }
+
+  /* รายบุคคล / รายโครงการ */
+  .lists { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr)); gap:16px 56px; margin:48px 0 56px; }
+  h2 { font-family:var(--serif); font-size:22px; margin:0 0 6px; }
+  .row { display:grid; grid-template-columns:1fr auto; gap:2px 12px; width:100%; text-align:left; padding:12px 8px 12px 10px;
+    background:none; border:0; border-bottom:1px solid var(--rule); cursor:pointer; }
+  .row[aria-pressed="true"] { box-shadow:inset 3px 0 0 var(--navy); background:color-mix(in srgb, var(--navy) 7%, transparent); }
+  .row .name { font-weight:500; } .row .frac { color:var(--muted); font-variant-numeric:tabular-nums; }
+  .row .note { grid-column:1/-1; font-size:13px; color:var(--muted); display:flex; gap:14px; flex-wrap:wrap; }
+  .row .note .bad { color:var(--overdue); font-weight:600; }
+  .bar { grid-column:1/-1; display:flex; gap:2px; height:10px; margin:6px 0 2px; }
+  .bar i { flex:var(--n) 1 0; background:var(--c); border-radius:2px; min-width:0; }
+  .bar i.pending { background:var(--pending); box-shadow:inset 0 0 0 1px var(--pending-edge); }
+
+  #tip { position:fixed; z-index:10; pointer-events:none; background:var(--ink); color:var(--paper); padding:8px 11px;
+    border-radius:6px; font-size:13px; line-height:1.5; max-width:240px; opacity:0; transition:opacity .12s; }
+  #tip.on { opacity:1; } #tip b { font-weight:600; }
+  @media (prefers-reduced-motion: reduce) { .tile { animation:none; } .tile, #tip { transition:none; } }
 </style>
 </head>
 <body>
-<header>
-  <h1>สรุปงานรายเดือน</h1>
-  <small>สำนักงานสถิติจังหวัดหนองบัวลำภู · ติดตามงานรายบุคคลและรายโครงการ</small>
-</header>
-<main>
-  <div class="bar">
-    <select id="month" aria-label="เลือกเดือน"></select>
-    <button class="tab active" data-v="persons">รายบุคคล</button>
-    <button class="tab" data-v="projects">รายโครงการ</button>
-    <select id="me" aria-label="เลือกชื่อของฉัน"><option value="">แจ้งเตือนของฉัน: เลือกชื่อ</option></select>
-  </div>
-  <div id="alerts"></div>
-  <div class="cards" id="cards"></div>
-  <div class="tablewrap"><table id="tbl"></table></div>
-  <div id="note"></div>
-</main>
+<div class="wrap">
+  <header class="top">
+    <div class="brand">
+      <div class="mark" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+      <div><b>สำนักงานสถิติจังหวัดหนองบัวลำภู</b><span>ติดตามงานสำรวจรายเดือน</span></div>
+    </div>
+    <div class="tools">
+      <label for="me" class="sr" style="position:absolute;left:-9999px">เลือกชื่อของฉัน</label>
+      <select id="me"><option value="">ดูในฐานะ: ทุกคน</option></select>
+      <a href="form.html">กรอกข้อมูล</a>
+    </div>
+  </header>
+  <nav class="months" id="months" aria-label="เลือกเดือน"></nav>
+  <div class="demo" id="demo" hidden>กำลังแสดงข้อมูลตัวอย่าง ใส่ URL ของ Apps Script ในตัวแปร API เพื่อดูข้อมูลจริง</div>
+
+  <main>
+    <h1 id="headline" aria-live="polite">กำลังโหลด…</h1>
+    <div class="legend" id="legend"></div>
+    <p class="hint">แต่ละช่องคือ 1 EA เลื่อนเมาส์เพื่อดูรายละเอียด หรือกดสถานะ/ชื่อเพื่อเน้นเฉพาะรายการนั้น</p>
+    <div class="me" id="meBox" hidden></div>
+
+    <section class="map" id="map" aria-label="แผนที่ EA ของเดือนนี้"></section>
+    <div class="empty" id="empty" hidden>ยังไม่มีแผนงานของเดือนนี้ <a href="form.html">กำหนดแผนรายเดือน</a></div>
+
+    <div class="lists">
+      <section><h2>รายบุคคล</h2><div id="persons"></div></section>
+      <section><h2>รายโครงการ</h2><div id="projects"></div></section>
+    </div>
+  </main>
+</div>
+<div id="tip" role="tooltip"></div>
+
 <script>
 // ใส่ URL ของ Web app (Apps Script) ที่ Deploy แล้ว ถ้าเว้นว่างจะแสดงข้อมูลตัวอย่าง
 const API = '';
 
-const THAI_MONTHS = ['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน',
-  'กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
-let view = 'persons', data = null;
+const MONTHS = ['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน','กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
+const SHORT  = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+const ORDER  = ['done','late','overdue','pending'];
+const ST = {
+  done:    { label:'ส่งแล้ว',                color:'var(--done)' },
+  late:    { label:'ส่งแล้ว แต่มีส่งช้า',    color:'var(--late)' },
+  overdue: { label:'ค้างส่ง',                color:'var(--overdue)' },
+  pending: { label:'ยังไม่ส่ง',              color:'var(--pending)' }
+};
 const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
-const DEMO = month => ({ month, label:'ข้อมูลตัวอย่าง',
-  total:{planned:20,done:13,remaining:7,pct:65,late:3,overdue:2},
-  persons:[{name:'สมชาย ใจดี',planned:8,done:6,remaining:2,pct:75,late:1,overdue:0},
-           {name:'สมหญิง รักงาน',planned:12,done:7,remaining:5,pct:58,late:2,overdue:2}],
-  projects:[{name:'สำรวจแรงงาน',planned:10,done:7,remaining:3,pct:70,late:1,overdue:1},
-            {name:'สำรวจการย้ายถิ่น',planned:6,done:4,remaining:2,pct:67,late:1,overdue:1},
-            {name:'สำรวจ ICT ครัวเรือน',planned:4,done:2,remaining:2,pct:50,late:1,overdue:0}] });
+let month = '', data = null, focus = null, solo = null;
 
+/* ---------- ข้อมูลตัวอย่าง ---------- */
+function demo(m) {
+  const plan = [['สำรวจแรงงาน', ['สมชาย ใจดี','สมหญิง รักงาน'], 10], ['สำรวจการย้ายถิ่น', ['สมชาย ใจดี','สมหญิง รักงาน'], 6],
+                ['สำรวจ ICT ครัวเรือน', ['สมหญิง รักงาน'], 4]];
+  const pat = ['done','done','late','done','overdue','pending','done','done','pending','late'];
+  const cells = []; let k = 0;
+  plan.forEach(([project, people, n]) => { for (let i = 0; i < n; i++, k++) {
+    const status = pat[k % pat.length];
+    cells.push({ ea:'EA-' + String(101 + k).padStart(4, '0'), person:people[i % people.length], project, status,
+      late: status === 'late' ? 1 : 0, overdue: status === 'overdue' ? 1 : 0 }); } });
+  return { month:m, total:{ late:cells.filter(c => c.late).length }, cells };
+}
+
+/* ---------- เดือน ---------- */
 function initMonths() {
-  const now = new Date(), sel = $('month');
-  for (let i = 0; i < 12; i++) {
+  const now = new Date(), box = $('months');
+  for (let i = 0; i < 6; i++) {
     const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
     const key = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
-    sel.add(new Option(THAI_MONTHS[d.getMonth()] + ' ' + (d.getFullYear() + 543), key));
+    const b = document.createElement('button');
+    b.textContent = SHORT[d.getMonth()] + ' ' + String(d.getFullYear() + 543).slice(2);
+    b.dataset.m = key; b.dataset.full = MONTHS[d.getMonth()] + ' ' + (d.getFullYear() + 543);
+    b.onclick = () => { month = key; focus = solo = null; syncMe(); load(); };
+    box.appendChild(b);
+    if (i === 0) month = key;
   }
 }
 
 async function load() {
-  const month = $('month').value;
-  $('note').textContent = 'กำลังโหลด…';
+  document.querySelectorAll('#months button').forEach(b => b.setAttribute('aria-pressed', b.dataset.m === month));
+  $('demo').hidden = !!API;
   try {
-    data = API ? await (await fetch(API + '?action=summary&month=' + month)).json() : DEMO(month);
-    $('note').textContent = API ? '' : 'ยังไม่ได้ใส่ URL ของ Apps Script จึงแสดงข้อมูลตัวอย่าง';
-  } catch (e) { $('note').textContent = 'โหลดข้อมูลไม่สำเร็จ: ' + e.message; return; }
-  const me = $('me'), keep = me.value;
-  me.length = 1;
-  data.persons.forEach(p => me.add(new Option(p.name, p.name)));
-  me.value = keep;
-  render(); loadAlerts();
+    data = API ? await (await fetch(API + '?action=summary&month=' + month)).json() : demo(month);
+  } catch (e) { $('headline').textContent = 'โหลดข้อมูลไม่สำเร็จ: ' + e.message; return; }
+  const sel = $('me'), keep = sel.value;
+  sel.length = 1;
+  [...new Set((data.cells || []).map(c => c.person))].sort((a, b) => a.localeCompare(b, 'th'))
+    .forEach(n => sel.add(new Option(n, n)));
+  sel.value = [...sel.options].some(o => o.value === keep) ? keep : '';
+  render(); loadMe();
 }
 
+/* ---------- คำนวณ ---------- */
+const count = cells => ORDER.reduce((o, s) => (o[s] = cells.filter(c => c.status === s).length, o), {});
+const groupBy = (cells, key) => cells.reduce((o, c) => ((o[c[key]] = o[c[key]] || []).push(c), o), {});
+const match = c => (!focus || c[focus.kind] === focus.value) && (!solo || c.status === solo);
+
+/* ---------- วาดหน้า ---------- */
 function render() {
-  const t = data.total;
-  $('cards').innerHTML = [['EA ตามแผน', t.planned], ['ส่งแล้ว', t.done], ['คงเหลือ', t.remaining],
-    ['ความคืบหน้า', t.pct + '%'], ['ส่งช้า (ครั้ง)', t.late], ['ค้างส่ง (วัน)', t.overdue]]
-    .map(([l, n]) => `<div class="card"><div class="n">${n}</div><div class="l">${l}</div></div>`).join('');
-  const rows = data[view].map(o => `<tr><td>${o.name}</td><td>${o.planned}</td><td>${o.done}</td>
-    <td>${o.remaining}</td><td><span class="prog"><i style="width:${o.pct}%"></i></span>${o.pct}%</td>
-    <td>${o.late}</td><td class="${o.overdue ? 'bad' : ''}">${o.overdue}</td></tr>`).join('');
-  $('tbl').innerHTML = `<tr><th>${view === 'persons' ? 'ผู้รับผิดชอบ' : 'โครงการ'}</th><th>EA ตามแผน</th>
-    <th>ส่งแล้ว</th><th>คงเหลือ</th><th>ความคืบหน้า</th><th>ส่งช้า</th><th>ค้างส่ง (วัน)</th></tr>` +
-    (rows || '<tr><td colspan="7">ยังไม่มีแผนงานของเดือนนี้</td></tr>');
+  const cells = data.cells || [], n = count(cells), sent = n.done + n.late;
+  const full = document.querySelector('#months button[aria-pressed="true"]').dataset.full;
+
+  $('headline').textContent = cells.length
+    ? 'เดือน' + full + ' ส่งงานแล้ว ' + sent + ' จาก ' + cells.length + ' EA'
+    : 'เดือน' + full + ' ยังไม่มีแผนงาน';
+  $('empty').hidden = cells.length > 0;
+
+  $('legend').innerHTML = ORDER.map(s => `<button data-s="${s}" aria-pressed="${solo === s}" style="--c:${ST[s].color}">
+    <span class="sw ${s === 'pending' ? 'pending' : ''}"></span><span class="n">${n[s]}</span><span class="l">${ST[s].label}</span></button>`).join('');
+  $('legend').querySelectorAll('button').forEach(b => b.onclick = () => { solo = solo === b.dataset.s ? null : b.dataset.s; render(); });
+
+  // แผนที่ EA แบ่งกลุ่มตามโครงการ (1 ช่อง = 1 EA)
+  const byProj = groupBy(cells, 'project'), flat = []; let i = 0;
+  $('map').innerHTML = Object.keys(byProj).sort((a, b) => a.localeCompare(b, 'th')).map(p => {
+    const list = byProj[p], c = count(list);
+    return `<div class="group"><h3>${esc(p)}<span>ส่งแล้ว ${c.done + c.late} จาก ${list.length}</span></h3><div class="tiles">` +
+      list.map(x => `<button class="tile ${x.status} ${match(x) ? '' : 'dim'}" style="--c:${ST[x.status].color};--i:${Math.min(i++, 70)}"
+        data-k="${flat.push(x) - 1}" aria-label="${esc(x.ea)} ${ST[x.status].label}"></button>`).join('') + '</div></div>';
+  }).join('');
+  $('map').querySelectorAll('.tile').forEach(t => {
+    const x = flat[+t.dataset.k];
+    t.onmouseenter = t.onfocus = () => tip(t, x);
+    t.onmouseleave = t.onblur = () => $('tip').classList.remove('on');
+  });
+
+  bars('persons', cells, 'person'); bars('projects', cells, 'project');
 }
 
-async function loadAlerts() {
-  const person = $('me').value, box = $('alerts');
-  box.innerHTML = '';
-  if (!person) return;
+function bars(id, cells, kind) {
+  const g = groupBy(cells, kind), names = Object.keys(g).sort((a, b) => a.localeCompare(b, 'th'));
+  $(id).innerHTML = names.length ? names.map(name => {
+    const list = g[name], c = count(list), late = list.reduce((t, x) => t + (x.late || 0), 0);
+    const open = list.reduce((t, x) => t + (x.status === 'overdue' ? (x.overdue || 1) : 0), 0);
+    const on = focus && focus.kind === kind && focus.value === name;
+    return `<button class="row" data-v="${esc(name)}" aria-pressed="${!!on}">
+      <span class="name">${esc(name)}</span><span class="frac">${c.done + c.late}/${list.length} EA</span>
+      <span class="bar" role="img" aria-label="ส่งแล้ว ${c.done + c.late} จาก ${list.length}">${ORDER.filter(s => c[s]).map(s =>
+        `<i class="${s}" style="--n:${c[s]};--c:${ST[s].color}"></i>`).join('')}</span>
+      <span class="note">${late ? `<span>ส่งช้า ${late} ครั้ง</span>` : ''}${open ? `<span class="bad">ค้างส่ง ${open} วัน</span>` : ''}${!late && !open ? '<span>ไม่มีรายการส่งช้า</span>' : ''}</span></button>`;
+  }).join('') : '<p class="hint">ยังไม่มีข้อมูล</p>';
+  $(id).querySelectorAll('.row').forEach(b => b.onclick = () => {
+    const same = focus && focus.kind === kind && focus.value === b.dataset.v;
+    focus = same ? null : { kind, value: b.dataset.v };
+    if (kind === 'person') $('me').value = same ? '' : b.dataset.v;
+    render(); loadMe();
+  });
+}
+
+/* ---------- ข้อความลอย ---------- */
+function tip(el, x) {
+  const t = $('tip');
+  t.innerHTML = `<b>${esc(x.ea)}</b><br>${esc(x.person)}<br>${esc(x.project)}<br>${ST[x.status].label}` +
+    (x.status === 'overdue' ? ` ${x.overdue || 1} วัน` : '') + (x.late ? ` · ส่งช้า ${x.late} ครั้ง` : '');
+  const r = el.getBoundingClientRect();
+  t.style.left = Math.max(8, Math.min(innerWidth - 248, r.left + r.width / 2 - 100)) + 'px';
+  t.style.top = (r.bottom + 8 + 90 > innerHeight ? r.top - 98 : r.bottom + 8) + 'px';
+  t.classList.add('on');
+}
+
+/* ---------- แจ้งเตือนของฉัน ---------- */
+function syncMe() { $('me').value = ''; }
+$('me').onchange = () => { focus = $('me').value ? { kind:'person', value:$('me').value } : null; render(); loadMe(); };
+
+async function loadMe() {
+  const person = $('me').value, box = $('meBox');
+  if (!person) { box.hidden = true; return; }
   let list = [];
   try {
     list = API ? (await (await fetch(API + '?person=' + encodeURIComponent(person))).json()).alerts
-               : (person === 'สมหญิง รักงาน' ? [{date:'8 ตุลาคม 2569', ea:'EA-0123', msg:'ค้างส่งงานประจำวันที่ 8 ตุลาคม 2569'}] : []);
-  } catch (e) { return; }
-  if (list.length) box.innerHTML = `<div class="alert"><b>คุณมี ${list.length} รายการค้างส่ง</b><br>` +
-    list.map(a => `• ${a.msg}`).join('<br>') + '</div>';
+               : (data.cells || []).filter(c => c.person === person && c.status === 'overdue')
+                   .map(c => ({ msg:'ค้างส่งงาน EA ' + c.ea + ' (' + c.project + ')' }));
+  } catch (e) { box.hidden = true; return; }
+  box.hidden = false;
+  box.className = 'me' + (list.length ? '' : ' clear');
+  box.innerHTML = list.length
+    ? `<p>${esc(person)} มี ${list.length} รายการค้างส่ง</p><ul>${list.map(a => `<li>${esc(a.msg)}</li>`).join('')}</ul>`
+    : `<p>${esc(person)} ส่งงานครบตามกำหนด ไม่มีรายการค้างส่ง</p>`;
 }
 
-document.querySelectorAll('.tab').forEach(b => b.onclick = () => {
-  document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
-  b.classList.add('active'); view = b.dataset.v; if (data) render();
-});
-$('month').onchange = load; $('me').onchange = loadAlerts;
 initMonths(); load();
 </script>
 </body>
