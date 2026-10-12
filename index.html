@@ -3,347 +3,278 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Dashboard สถิติหนองบัวลำภู ต.ค.69 - มี ID</title>
+<title>Dashboard สถิติหนองบัวลำภู ต.ค.69 - แก้สถานะ Real-time</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@300;400;500;600;700&family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<style>
-  body{font-family:'Noto Sans Thai','Prompt',sans-serif}
-  .glass{backdrop-filter:blur(16px);background:rgba(255,255,255,0.85)}
-  .id-badge{font-family:monospace;letter-spacing:0.5px}
-</style>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;600;700&family=Prompt:wght@400;600&display=swap" rel="stylesheet">
+<style>body{font-family:'Noto Sans Thai','Prompt',sans-serif} .glass{backdrop-filter:blur(16px);background:rgba(255,255,255,.9)} .id-badge{font-family:monospace}</style>
 </head>
 <body class="bg-[#f8fafc] text-slate-800">
-<!-- HEADER -->
-<header class="sticky top-0 z-40 glass border-b border-slate-200/60">
-  <div class="max-w-[1440px] mx-auto px-6 py-4 flex items-center justify-between">
-    <div class="flex items-center gap-4">
-      <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-900 to-sky-500 flex items-center justify-center text-white font-bold text-xl shadow-lg">ส</div>
-      <div>
-        <h1 class="font-bold text-[17px] leading-none">สำนักงานสถิติจังหวัดหนองบัวลำภู</h1>
-        <p class="text-[12px] text-slate-500 mt-1">ผลการดำเนินงานรายบุคคล ประจำเดือน ตุลาคม 2569 • มีระบบ ID</p>
-      </div>
-    </div>
-    <div class="flex items-center gap-2">
-      <span class="text-[11px] bg-emerald-100 text-emerald-700 px-3 py-1 rounded-full font-semibold">ID System Enabled</span>
-      <span class="text-[11px] bg-blue-100 text-blue-700 px-3 py-1 rounded-full">1-12 ต.ค. 69</span>
-    </div>
+<header class="sticky top-0 z-40 glass border-b">
+  <div class="max-w-[1440px] mx-auto px-6 py-4 flex justify-between items-center">
+    <div class="flex gap-3 items-center"><div class="w-11 h-11 rounded-xl bg-gradient-to-br from-blue-900 to-sky-500 flex items-center justify-center text-white font-bold">ส</div><div><h1 class="font-bold text-[16px]">สำนักงานสถิติจังหวัดหนองบัวลำภู</h1><p class="text-[11px] text-slate-500">ผลการดำเนินงาน ต.ค.69 • Real-time Status • ID System</p></div></div>
+    <div class="flex gap-2"><span class="text-[11px] bg-emerald-100 text-emerald-700 px-3 py-1 rounded-full font-bold" id="liveIndicator">● Live Update</span><span class="text-[11px] bg-slate-900 text-white px-3 py-1 rounded-full" id="kpiProgressHeader">40% เสร็จ</span></div>
   </div>
 </header>
 
-<main class="max-w-[1440px] mx-auto px-6 py-6">
-  <!-- TABS -->
-  <div class="flex gap-2 mb-6 overflow-x-auto pb-2">
-    <button data-tab="overview" class="tab-btn active bg-slate-900 text-white px-5 py-2.5 rounded-full text-[13px] font-medium shadow">ภาพรวม</button>
-    <button data-tab="person" class="tab-btn bg-white border px-5 py-2.5 rounded-full text-[13px] font-medium">รายบุคคล + ID</button>
-    <button data-tab="late" class="tab-btn bg-white border px-5 py-2.5 rounded-full text-[13px] font-medium">งานคงเหลือ & ส่งช้า</button>
-    <button data-tab="form" class="tab-btn bg-white border px-5 py-2.5 rounded-full text-[13px] font-medium">ฟอร์มกรอก (มี ID)</button>
-    <button data-tab="fix" class="tab-btn bg-white border px-5 py-2.5 rounded-full text-[13px] font-medium">วิธีแก้ Error</button>
+<main class="max-w-[1440px] mx-auto px-6 py-5">
+  <div class="flex gap-2 mb-5 overflow-x-auto">
+    <button data-tab="overview" class="tab-btn active bg-slate-900 text-white px-5 py-2.5 rounded-full text-[13px]">ภาพรวม</button>
+    <button data-tab="person" class="tab-btn bg-white border px-5 py-2.5 rounded-full text-[13px]">รายบุคคล</button>
+    <button data-tab="late" class="tab-btn bg-white border px-5 py-2.5 rounded-full text-[13px]">งานคงเหลือ & ส่งช้า <span id="remainingBadge" class="ml-2 bg-amber-500 text-white px-2 py-0.5 rounded-full text-[10px]">12</span></button>
+    <button data-tab="form" class="tab-btn bg-white border px-5 py-2.5 rounded-full text-[13px]">ฟอร์มกรอก (แก้แล้ว)</button>
   </div>
 
-  <!-- OVERVIEW -->
   <div id="tab-overview" class="tab-panel">
-    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-6">
-      <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-100">
-        <div class="text-[11px] text-slate-400 uppercase tracking-wider">มอบหมายทั้งหมด</div>
-        <div class="text-3xl font-bold mt-2">20</div><div class="text-[12px] text-slate-500">EA</div>
-      </div>
-      <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-100">
-        <div class="text-[11px] text-emerald-600 uppercase tracking-wider">เสร็จแล้ว</div>
-        <div class="text-3xl font-bold mt-2 text-emerald-600">8</div><div class="text-[12px] text-emerald-600">EA • 40%</div>
-      </div>
-      <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-100">
-        <div class="text-[11px] text-amber-600 uppercase tracking-wider">คงเหลือ</div>
-        <div class="text-3xl font-bold mt-2 text-amber-600">12</div><div class="text-[12px]">ยังไม่ถึงคาบ / ค้าง</div>
-      </div>
-      <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-100">
-        <div class="text-[11px] text-slate-400 uppercase">ครัวเรือน</div>
-        <div class="text-3xl font-bold mt-2">130</div><div class="text-[12px] text-slate-500">ได้ข้อมูล 116</div>
-      </div>
-      <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-100">
-        <div class="text-[11px] text-slate-400 uppercase">ประสิทธิภาพ</div>
-        <div class="text-3xl font-bold mt-2">100%</div><div class="text-[12px] text-emerald-600">เฉลี่ย</div>
-      </div>
-      <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-100">
-        <div class="text-[11px] text-red-500 uppercase">ส่งช้า</div>
-        <div class="text-3xl font-bold mt-2 text-red-500">2</div><div class="text-[12px] text-red-500">ช้า 1 วัน</div>
-      </div>
-    </div>
-
+    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-6" id="kpiGrid"></div>
     <div class="grid lg:grid-cols-3 gap-6">
-      <div class="bg-white rounded-2xl p-6 shadow-sm border">
-        <h3 class="font-semibold mb-4">ความคืบหน้าโครงการ</h3>
-        <canvas id="progressChart" height="220"></canvas>
-      </div>
-      <div class="lg:col-span-2 bg-white rounded-2xl p-6 shadow-sm border">
-        <h3 class="font-semibold mb-4">ประสิทธิภาพรายบุคคล (รวม ID)</h3>
-        <div class="overflow-auto">
-          <table class="w-full text-[13px]">
-            <thead class="text-[11px] text-slate-400 uppercase"><tr><th class="text-left py-2">ID ตัวอย่าง</th><th class="text-left">พนักงาน</th><th>มอบหมาย</th><th>เสร็จ</th><th>คงเหลือ</th><th>ประสิทธิภาพ</th></tr></thead>
-            <tbody id="personSummaryBody"></tbody>
-          </table>
-        </div>
-      </div>
+      <div class="bg-white rounded-2xl p-6 shadow-sm border"><h3 class="font-semibold mb-3">ความคืบหน้า</h3><canvas id="progressChart" height="200"></canvas><div id="progressDetail" class="mt-3 text-[12px]"></div></div>
+      <div class="lg:col-span-2 bg-white rounded-2xl p-6 shadow-sm border"><h3 class="font-semibold mb-3">สรุปรายบุคคล - อัปเดต Real-time</h3><div id="personSummary" class="overflow-auto"></div></div>
     </div>
   </div>
 
-  <!-- PERSON -->
-  <div id="tab-person" class="tab-panel hidden">
-    <div id="personCards" class="grid md:grid-cols-2 gap-5"></div>
-  </div>
+  <div id="tab-person" class="tab-panel hidden"><div id="personCards" class="grid md:grid-cols-2 gap-5"></div></div>
 
-  <!-- LATE -->
   <div id="tab-late" class="tab-panel hidden">
     <div class="grid lg:grid-cols-2 gap-6">
-      <div class="bg-white rounded-2xl p-6 shadow-sm border">
-        <h3 class="font-semibold mb-1">⏰ งานส่งช้า - แสดงระยะเวลาชัดเจน</h3>
-        <p class="text-[12px] text-slate-500 mb-4">มี ID อ้างอิงทุกรายการ</p>
-        <div id="lateTable"></div>
-      </div>
-      <div class="bg-white rounded-2xl p-6 shadow-sm border">
-        <h3 class="font-semibold mb-1">📋 งานคงเหลือ / ยังไม่ถึงคาบงานสนาม</h3>
-        <p class="text-[12px] text-slate-500 mb-4">12 EA ที่ยังไม่ได้ส่ง</p>
-        <div id="remainingTable"></div>
-      </div>
+      <div class="bg-white rounded-2xl p-6 shadow-sm border"><h3 class="font-semibold">⏰ งานส่งช้า</h3><p class="text-[11px] text-slate-500 mb-3">แสดงเวลาช้าเป็นวัน-ชั่วโมงชัดเจน มี ID ทุกรายการ</p><div id="lateTable"></div></div>
+      <div class="bg-white rounded-2xl p-6 shadow-sm border"><h3 class="font-semibold">📋 งานคงเหลือ / ยังไม่ถึงคาบงานสนาม</h3><p class="text-[11px] text-slate-500 mb-3">เมื่อกรอกฟอร์ม PSU นี้จะหายไปจากตารางนี้ทันที</p><div id="remainingTable"></div></div>
     </div>
   </div>
 
-  <!-- FORM -->
   <div id="tab-form" class="tab-panel hidden">
     <div class="bg-white rounded-2xl p-6 shadow-sm border max-w-5xl">
-      <h3 class="font-semibold text-[16px] mb-1">ฟอร์มกรอกข้อมูลรายบุคคล - มีระบบ ID อัตโนมัติ</h3>
-      <p class="text-[12px] text-slate-500 mb-6">ID จะถูกสร้างอัตโนมัติตาม PSU เช่น NSO-NBL-69-0077-20261010-143022-A1B2</p>
-      
+      <div class="bg-gradient-to-r from-blue-50 to-emerald-50 border border-blue-200 rounded-xl p-4 mb-6">
+        <h3 class="font-bold text-[14px] text-blue-900">✅ แก้แล้ว: กรอกแล้วสถานะเปลี่ยนทันที</h3>
+        <p class="text-[12px] text-slate-600 mt-1">เมื่อกดบันทึก → ระบบจะ: 1) สร้าง ID อัตโนมัติ 2) คำนวณเวลาช้า 3) ย้าย PSU จาก "คงเหลือ" ไป "เสร็จแล้ว" 4) อัปเดต KPI, กราฟ, การ์ดรายบุคคลทันที โดยไม่ต้องรีเฟรช</p>
+      </div>
       <form id="entryForm" class="grid md:grid-cols-3 gap-4">
-        <div class="md:col-span-3 bg-blue-50 border border-blue-200 rounded-xl p-4 flex gap-3">
-          <div class="flex-1">
-            <label class="text-[11px] font-semibold uppercase text-blue-700">ID (สร้างอัตโนมัติ)</label>
-            <input id="f_id" class="w-full mt-1 px-3 py-2.5 rounded-lg border bg-white id-badge text-[13px]" placeholder="จะสร้างอัตโนมัติเมื่อเลือก PSU" readonly>
-          </div>
-          <div class="flex items-end">
-            <button type="button" id="genIdBtn" class="px-4 py-2.5 bg-blue-600 text-white rounded-lg text-[13px]">สร้าง ID ใหม่</button>
-          </div>
+        <div class="md:col-span-3 bg-slate-900 text-white rounded-xl p-4 flex gap-3 items-center">
+          <div class="flex-1"><label class="text-[11px] opacity-70 uppercase">ID (Auto)</label><input id="f_id" readonly class="w-full mt-1 px-3 py-2 rounded-lg bg-white/10 border border-white/20 id-badge text-[13px] text-white" placeholder="จะสร้างอัตโนมัติ"></div>
+          <button type="button" id="genIdBtn" class="px-4 py-2 bg-white text-slate-900 rounded-lg text-[13px] font-bold">สร้างใหม่</button>
         </div>
-
-        <div><label class="text-[11px] font-semibold uppercase">พนักงานแจงนับ *</label><select id="f_person" class="w-full mt-1 px-3 py-2.5 rounded-xl border bg-white text-[13px]" required>
-          <option value="">เลือก</option><option>น.ส.พัชริดา บุญอุ้ม</option><option>นายสันติ แซ่ลิ้ม</option><option>นางสาวศุจินธร ทองกรณ์</option><option>นายธนาวัฒน์ ชัยศรีหา</option>
-        </select></div>
-        <div><label class="text-[11px] font-semibold uppercase">อำเภอ</label><input id="f_district" class="w-full mt-1 px-3 py-2.5 rounded-xl border text-[13px]" placeholder="เช่น ศรีบุญเรือง"></div>
-        <div><label class="text-[11px] font-semibold uppercase">ตำบล</label><input id="f_sub" class="w-full mt-1 px-3 py-2.5 rounded-xl border text-[13px]" placeholder="เช่น โนนสะอาด"></div>
-
-        <div><label class="text-[11px] font-semibold uppercase">EA *</label><input id="f_ea" class="w-full mt-1 px-3 py-2.5 rounded-xl border text-[13px]" placeholder="0013" required></div>
-        <div><label class="text-[11px] font-semibold uppercase">PSU-NO *</label><input id="f_psu" class="w-full mt-1 px-3 py-2.5 rounded-xl border text-[13px]" placeholder="0077" required></div>
-        <div><label class="text-[11px] font-semibold uppercase">หมู่ / บ้าน</label><div class="flex gap-2 mt-1"><input id="f_moo" class="w-1/3 px-3 py-2.5 rounded-xl border text-[13px]" placeholder="หมู่"><input id="f_village" class="flex-1 px-3 py-2.5 rounded-xl border text-[13px]" placeholder="ชื่อบ้าน"></div></div>
-
-        <div><label class="text-[11px] font-semibold uppercase">วันที่ปฏิบัติงาน *</label><input id="f_work" type="date" class="w-full mt-1 px-3 py-2.5 rounded-xl border text-[13px]" value="2026-10-06" required></div>
-        <div><label class="text-[11px] font-semibold uppercase">วันที่ส่งงาน *</label><input id="f_send" type="date" class="w-full mt-1 px-3 py-2.5 rounded-xl border text-[13px]" value="2026-10-07" required></div>
-        <div><label class="text-[11px] font-semibold uppercase">สถานะส่งช้า (คำนวณอัตโนมัติ)</label><div id="delayBadge" class="mt-1 px-3 py-2.5 rounded-xl bg-slate-100 text-[13px] font-medium">-</div></div>
-
-        <div><label class="text-[11px] font-semibold uppercase">ปริมาณทั้งสิ้น</label><input id="f_total" type="number" class="w-full mt-1 px-3 py-2.5 rounded-xl border text-[13px]" value="16"></div>
-        <div><label class="text-[11px] font-semibold uppercase">ได้ข้อมูล</label><input id="f_valid" type="number" class="w-full mt-1 px-3 py-2.5 rounded-xl border text-[13px]" value="13"></div>
-        <div><label class="text-[11px] font-semibold uppercase">ไม่ได้ข้อมูล</label><input id="f_invalid" type="number" class="w-full mt-1 px-3 py-2.5 rounded-xl border text-[13px]" value="3"></div>
-
-        <div class="md:col-span-3"><label class="text-[11px] font-semibold uppercase">หมายเหตุ</label><input id="f_note" class="w-full mt-1 px-3 py-2.5 rounded-xl border text-[13px]" placeholder="เช่น ยังไม่ถึงคาบงานสนาม หรือสาเหตุส่งช้า"></div>
-
+        <div><label class="text-[11px] font-bold uppercase">พนักงาน *</label><select id="f_person" required class="w-full mt-1 px-3 py-2.5 rounded-xl border text-[13px] bg-white"><option value="">เลือก</option><option>น.ส.พัชริดา บุญอุ้ม</option><option>นายสันติ แซ่ลิ้ม</option><option>นางสาวศุจินธร ทองกรณ์</option><option>นายธนาวัฒน์ ชัยศรีหา</option></select></div>
+        <div><label class="text-[11px] font-bold uppercase">อำเภอ *</label><input id="f_district" required class="w-full mt-1 px-3 py-2.5 rounded-xl border text-[13px]" placeholder="ศรีบุญเรือง"></div>
+        <div><label class="text-[11px] font-bold uppercase">ตำบล *</label><input id="f_sub" required class="w-full mt-1 px-3 py-2.5 rounded-xl border text-[13px]" placeholder="โนนสะอาด"></div>
+        <div><label class="text-[11px] font-bold uppercase">EA *</label><input id="f_ea" required class="w-full mt-1 px-3 py-2.5 rounded-xl border text-[13px]" placeholder="0013"></div>
+        <div><label class="text-[11px] font-bold uppercase">PSU-NO *</label><input id="f_psu" required class="w-full mt-1 px-3 py-2.5 rounded-xl border text-[13px] bg-amber-50" placeholder="0077"><div class="text-[10px] text-amber-700 mt-1">* ถ้า PSU อยู่ในงานคงเหลือ จะถูกย้ายทันที</div></div>
+        <div><label class="text-[11px] font-bold uppercase">หมู่/บ้าน</label><div class="flex gap-2 mt-1"><input id="f_moo" class="w-1/3 px-3 py-2.5 rounded-xl border text-[13px]" placeholder="หมู่"><input id="f_village" class="flex-1 px-3 py-2.5 rounded-xl border text-[13px]" placeholder="บ้าน"></div></div>
+        <div><label class="text-[11px] font-bold uppercase">วันที่ปฏิบัติ *</label><input id="f_work" type="date" required class="w-full mt-1 px-3 py-2.5 rounded-xl border text-[13px]" value="2026-10-10"></div>
+        <div><label class="text-[11px] font-bold uppercase">วันที่ส่ง *</label><input id="f_send" type="date" required class="w-full mt-1 px-3 py-2.5 rounded-xl border text-[13px]" value="2026-10-10"></div>
+        <div><label class="text-[11px] font-bold uppercase">สถานะช้า (Auto)</label><div id="delayBadge" class="mt-1 px-3 py-2.5 rounded-xl bg-slate-100 text-[13px] font-bold">-</div></div>
+        <div><label class="text-[11px] font-bold uppercase">ปริมาณ</label><input id="f_total" type="number" class="w-full mt-1 px-3 py-2.5 rounded-xl border text-[13px]" value="16"></div>
+        <div><label class="text-[11px] font-bold uppercase">ได้ข้อมูล</label><input id="f_valid" type="number" class="w-full mt-1 px-3 py-2.5 rounded-xl border text-[13px]" value="14"></div>
+        <div><label class="text-[11px] font-bold uppercase">ไม่ได้</label><input id="f_invalid" type="number" class="w-full mt-1 px-3 py-2.5 rounded-xl border text-[13px]" value="2"></div>
+        <div class="md:col-span-3"><label class="text-[11px] font-bold uppercase">หมายเหตุ</label><input id="f_note" class="w-full mt-1 px-3 py-2.5 rounded-xl border text-[13px]" placeholder="เช่น ส่งช้าเพราะฝนตก, ยังไม่ถึงคาบงานสนาม"></div>
         <div class="md:col-span-3 flex gap-3 pt-2">
-          <button type="submit" class="flex-1 bg-slate-900 text-white py-3 rounded-xl text-[14px] font-semibold shadow">💾 บันทึก (พร้อม ID)</button>
-          <button type="button" id="clearForm" class="px-6 py-3 bg-white border rounded-xl text-[14px]">ล้าง</button>
+          <button type="submit" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl text-[14px] font-bold shadow">💾 บันทึก & อัปเดตสถานะทันที</button>
+          <button type="button" id="clearForm" class="px-6 py-3 bg-white border rounded-xl text-[13px]">ล้าง</button>
+          <button type="button" id="resetData" class="px-6 py-3 bg-slate-100 rounded-xl text-[13px]">รีเซ็ตข้อมูล</button>
         </div>
       </form>
-
-      <div class="mt-8 border-t pt-6">
-        <h4 class="font-semibold text-[13px] mb-3">ข้อมูลล่าสุดที่บันทึก (มี ID)</h4>
-        <div id="savedTable" class="overflow-auto"></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- FIX -->
-  <div id="tab-fix" class="tab-panel hidden">
-    <div class="bg-white rounded-2xl p-8 shadow-sm border">
-      <h2 class="text-xl font-bold mb-2">🔧 แก้ Error: No HTML file named Dashboard was found</h2>
-      <p class="text-[13px] text-slate-600 mb-6">ลิงก์ของคุณ: <code class="bg-slate-100 px-2 py-1 rounded text-[12px]">https://script.google.com/macros/s/AKfycbxj_Sp1.../exec</code> เจอ Error บรรทัด 46 เพราะไม่มีไฟล์ Dashboard.html</p>
-      
-      <div class="grid md:grid-cols-2 gap-6">
-        <div class="bg-red-50 border border-red-200 rounded-xl p-5">
-          <h3 class="font-semibold text-red-800 mb-2">❌ สาเหตุ</h3>
-          <p class="text-[13px]">ใน Code.gs เดิมใช้ <code>HtmlService.createTemplateFromFile('Dashboard')</code> แต่ในโปรเจค Apps Script ไม่มีไฟล์ชื่อ Dashboard.html เลยทำให้ Deploy แล้ว Error</p>
-        </div>
-        <div class="bg-green-50 border border-green-200 rounded-xl p-5">
-          <h3 class="font-semibold text-green-800 mb-2">✅ วิธีแก้ 2 แบบ</h3>
-          <ol class="text-[13px] list-decimal ml-5 space-y-1">
-            <li>ใช้ <b>Code_fixed_ID.gs</b> ที่ให้ไป - มีฟังก์ชัน <code>getEmbeddedDashboardHtml()</code> ฝัง HTML ไว้แล้ว ไม่ต้องสร้างไฟล์ก็รันได้</li>
-            <li>หรือสร้างไฟล์ <b>Dashboard.html</b> ใน Apps Script Editor (คลิก + → HTML → ตั้งชื่อ Dashboard) แล้ววางโค้ดไฟล์นี้ทั้งหมด</li>
-          </ol>
-        </div>
-      </div>
-
-      <div class="mt-6 bg-slate-900 text-slate-100 rounded-xl p-5 overflow-auto text-[12px]">
-        <div class="font-semibold mb-2">ขั้นตอน Deploy ใหม่:</div>
-        <pre class="whitespace-pre-wrap">1. เปิด https://script.google.com → โปรเจคของคุณ
-2. ลบ Code.gs เดิม ทับด้วย Code_fixed_ID.gs
-3. ถ้าเลือกแบบแยกไฟล์: + New HTML → ชื่อ Dashboard → วางโค้ด Dashboard.html นี้
-4. Save (Ctrl+S)
-5. Deploy → Manage Deployments → Edit → Version: New Version → Deploy
-6. ทดสอบลิงก์ใหม่ จะไม่ Error แล้ว
-
-เพิ่มเมนูใหม่ใน Google Sheets:
-- เปิด Sheet → เมนู 📊 Dashboard สถิติ → เพิ่มคอลัมน์ ID
-- ระบบจะเติม ID ให้ข้อมูลเก่า 8 แถวอัตโนมัติ</pre>
-      </div>
-
-      <div class="mt-6 flex gap-3">
-        <a href="#" id="downloadGs" class="bg-blue-600 text-white px-5 py-2.5 rounded-xl text-[13px] font-medium">⬇️ ดาวน์โหลด Code_fixed_ID.gs</a>
-        <a href="#" id="downloadHtml" class="bg-white border px-5 py-2.5 rounded-xl text-[13px] font-medium">⬇️ ดาวน์โหลด Dashboard.html</a>
-      </div>
+      <div class="mt-8 border-t pt-5"><h4 class="font-bold text-[13px] mb-3">📜 ประวัติบันทึก (มี ID) - ล่าสุด 10 รายการ</h4><div id="savedTable"></div></div>
     </div>
   </div>
 </main>
 
+<div id="toast" class="fixed bottom-5 right-5 bg-slate-900 text-white px-5 py-3 rounded-xl shadow-2xl text-[13px] hidden z-50"></div>
+
 <script>
-// DATA
-const completedData = [
-  {ID:'NSO-NBL-69-0077-20261006-070000-A1', พนักงาน:'น.ส.พัชริดา บุญอุ้ม', PSU:'0077', อำเภอ:'ศรีบุญเรือง', ตำบล:'โนนสะอาด', EA:'0013', ปฏิบัติ:'2026-10-06', ส่ง:'2026-10-07', ช้า:1, ช้า_text:'ช้า 1 วัน 0 ชม. (6 ต.ค. → 7 ต.ค.)', ปริมาณ:16, ได้:13, ไม่ได้:3, ร้อยละ:100},
-  {ID:'NSO-NBL-69-0094-20261006-070000-B2', พนักงาน:'นายสันติ แซ่ลิ้ม', PSU:'0094', อำเภอ:'โนนสัง', ตำบล:'หนองเรือ', EA:'0004', ปฏิบัติ:'2026-10-06', ส่ง:'2026-10-07', ช้า:1, ช้า_text:'ช้า 1 วัน 0 ชม. (6 ต.ค. → 7 ต.ค.)', ปริมาณ:16, ได้:15, ไม่ได้:1, ร้อยละ:100},
-  {ID:'NSO-NBL-69-0093-20261006-060000-C3', พนักงาน:'นางสาวศุจินธร ทองกรณ์', PSU:'0093', อำเภอ:'นากลาง', ตำบล:'กุดดินจี่', EA:'0018', ปฏิบัติ:'2026-10-06', ส่ง:'2026-10-06', ช้า:0, ช้า_text:'ส่งตรงเวลา (0 วัน)', ปริมาณ:16, ได้:15, ไม่ได้:1, ร้อยละ:100},
-  {ID:'NSO-NBL-69-0074-20261007-070000-D4', พนักงาน:'นางสาวศุจินธร ทองกรณ์', PSU:'0074', อำเภอ:'เมืองหนองบัวลำภู', ตำบล:'ลำภู', EA:'0016', ปฏิบัติ:'2026-10-07', ส่ง:'2026-10-07', ช้า:0, ช้า_text:'ส่งตรงเวลา', ปริมาณ:16, ได้:13, ไม่ได้:3, ร้อยละ:100},
-  {ID:'NSO-NBL-69-0095-20261008-080000-E5', พนักงาน:'นางสาวศุจินธร ทองกรณ์', PSU:'0095', อำเภอ:'ศรีบุญเรือง', ตำบล:'โนนสะอาด', EA:'0016', ปฏิบัติ:'2026-10-08', ส่ง:'2026-10-08', ช้า:0, ช้า_text:'ส่งตรงเวลา', ปริมาณ:16, ได้:15, ไม่ได้:1, ร้อยละ:100},
-  {ID:'NSO-NBL-69-0075-20261006-060000-F6', พนักงาน:'นายธนาวัฒน์ ชัยศรีหา', PSU:'0075', อำเภอ:'นากลาง', ตำบล:'กุดดินจี่', EA:'0015', ปฏิบัติ:'2026-10-06', ส่ง:'2026-10-06', ช้า:0, ช้า_text:'ส่งตรงเวลา', ปริมาณ:18, ได้:14, ไม่ได้:4, ร้อยละ:100},
-  {ID:'NSO-NBL-69-0092-20261007-070000-G7', พนักงาน:'นายธนาวัฒน์ ชัยศรีหา', PSU:'0092', อำเภอ:'เมืองหนองบัวลำภู', ตำบล:'ลำภู', EA:'0018', ปฏิบัติ:'2026-10-07', ส่ง:'2026-10-07', ช้า:0, ช้า_text:'ส่งตรงเวลา', ปริมาณ:16, ได้:15, ไม่ได้:1, ร้อยละ:100},
-  {ID:'NSO-NBL-69-0050-20261008-080000-H8', พนักงาน:'นายธนาวัฒน์ ชัยศรีหา', PSU:'0050', อำเภอ:'เมืองหนองบัวลำภู', ตำบล:'ป่าไม้งาม', EA:'0003', ปฏิบัติ:'2026-10-08', ส่ง:'2026-10-08', ช้า:0, ช้า_text:'ส่งตรงเวลา', ปริมาณ:16, ได้:16, ไม่ได้:0, ร้อยละ:100},
+// ===== INITIAL DATA =====
+const INITIAL_COMPLETED = [
+  {ID:'NSO-NBL-69-0077-20261006-0700-A1', พนักงาน:'น.ส.พัชริดา บุญอุ้ม', PSU:'0077', อำเภอ:'ศรีบุญเรือง', ตำบล:'โนนสะอาด', EA:'0013', ปฏิบัติ:'2026-10-06', ส่ง:'2026-10-07', ช้า:1, ช้า_text:'ช้า 1 วัน 0 ชม.', ปริมาณ:16, ได้:13, ไม่ได้:3, ร้อยละ:100},
+  {ID:'NSO-NBL-69-0094-20261006-0700-B2', พนักงาน:'นายสันติ แซ่ลิ้ม', PSU:'0094', อำเภอ:'โนนสัง', ตำบล:'หนองเรือ', EA:'0004', ปฏิบัติ:'2026-10-06', ส่ง:'2026-10-07', ช้า:1, ช้า_text:'ช้า 1 วัน 0 ชม.', ปริมาณ:16, ได้:15, ไม่ได้:1, ร้อยละ:100},
+  {ID:'NSO-NBL-69-0093-20261006-0600-C3', พนักงาน:'นางสาวศุจินธร ทองกรณ์', PSU:'0093', อำเภอ:'นากลาง', ตำบล:'กุดดินจี่', EA:'0018', ปฏิบัติ:'2026-10-06', ส่ง:'2026-10-06', ช้า:0, ช้า_text:'ตรงเวลา', ปริมาณ:16, ได้:15, ไม่ได้:1, ร้อยละ:100},
+  {ID:'NSO-NBL-69-0074-20261007-0700-D4', พนักงาน:'นางสาวศุจินธร ทองกรณ์', PSU:'0074', อำเภอ:'เมืองหนองบัวลำภู', ตำบล:'ลำภู', EA:'0016', ปฏิบัติ:'2026-10-07', ส่ง:'2026-10-07', ช้า:0, ช้า_text:'ตรงเวลา', ปริมาณ:16, ได้:13, ไม่ได้:3, ร้อยละ:100},
+  {ID:'NSO-NBL-69-0095-20261008-0800-E5', พนักงาน:'นางสาวศุจินธร ทองกรณ์', PSU:'0095', อำเภอ:'ศรีบุญเรือง', ตำบล:'โนนสะอาด', EA:'0016', ปฏิบัติ:'2026-10-08', ส่ง:'2026-10-08', ช้า:0, ช้า_text:'ตรงเวลา', ปริมาณ:16, ได้:15, ไม่ได้:1, ร้อยละ:100},
+  {ID:'NSO-NBL-69-0075-20261006-0600-F6', พนักงาน:'นายธนาวัฒน์ ชัยศรีหา', PSU:'0075', อำเภอ:'นากลาง', ตำบล:'กุดดินจี่', EA:'0015', ปฏิบัติ:'2026-10-06', ส่ง:'2026-10-06', ช้า:0, ช้า_text:'ตรงเวลา', ปริมาณ:18, ได้:14, ไม่ได้:4, ร้อยละ:100},
+  {ID:'NSO-NBL-69-0092-20261007-0700-G7', พนักงาน:'นายธนาวัฒน์ ชัยศรีหา', PSU:'0092', อำเภอ:'เมืองหนองบัวลำภู', ตำบล:'ลำภู', EA:'0018', ปฏิบัติ:'2026-10-07', ส่ง:'2026-10-07', ช้า:0, ช้า_text:'ตรงเวลา', ปริมาณ:16, ได้:15, ไม่ได้:1, ร้อยละ:100},
+  {ID:'NSO-NBL-69-0050-20261008-0800-H8', พนักงาน:'นายธนาวัฒน์ ชัยศรีหา', PSU:'0050', อำเภอ:'เมืองหนองบัวลำภู', ตำบล:'ป่าไม้งาม', EA:'0003', ปฏิบัติ:'2026-10-08', ส่ง:'2026-10-08', ช้า:0, ช้า_text:'ตรงเวลา', ปริมาณ:16, ได้:16, ไม่ได้:0, ร้อยละ:100},
+];
+const INITIAL_REMAINING = [
+  {ID:'NSO-NBL-69-0096-PEND', พนักงาน:'นางสาวศุจินธร ทองกรณ์', PSU:'0096', อำเภอ:'สุวรรณคูหา', ตำบล:'นาด่าน', EA:'0004', สถานะ:'งานคงค้าง', หมายเหตุ:'ค้างส่ง 11 วัน'},
+  {ID:'NSO-NBL-69-0076-PEND', พนักงาน:'นางสาวศุจินธร ทองกรณ์', PSU:'0076', อำเภอ:'โนนสัง', ตำบล:'โนนสัง', EA:'0014', สถานะ:'ยังไม่ถึงคาบงานสนาม', หมายเหตุ:'ยังไม่ถึงคาบงานสนาม'},
+  {ID:'NSO-NBL-69-0073-PEND', พนักงาน:'นางสาวศุจินธร ทองกรณ์', PSU:'0073', อำเภอ:'เมืองหนองบัวลำภู', ตำบล:'หนองบัว', EA:'0010+0003', สถานะ:'ยังไม่ถึงคาบงานสนาม', หมายเหตุ:'ยังไม่ถึงคาบงานสนาม'},
+  {ID:'NSO-NBL-69-0064-PEND', พนักงาน:'นางสาวศุจินธร ทองกรณ์', PSU:'0064', อำเภอ:'ศรีบุญเรือง', ตำบล:'หันนางาม', EA:'0008', สถานะ:'งานคงค้าง', หมายเหตุ:'งานคงเหลือ'},
+  {ID:'NSO-NBL-69-0091-PEND', พนักงาน:'นางสาวศุจินธร ทองกรณ์', PSU:'0091', อำเภอ:'เมืองหนองบัวลำภู', ตำบล:'หนองบัว', EA:'0013', สถานะ:'ยังไม่ถึงคาบงานสนาม', หมายเหตุ:'ยังไม่ถึงคาบงานสนาม'},
+  {ID:'NSO-NBL-69-0062-PEND', พนักงาน:'นางสาวศุจินธร ทองกรณ์', PSU:'0062', อำเภอ:'เมืองหนองบัวลำภู', ตำบล:'ป่าไม้งาม', EA:'0007', สถานะ:'งานคงค้าง', หมายเหตุ:'งานคงเหลือ'},
+  {ID:'NSO-NBL-69-0078-PEND', พนักงาน:'นายธนาวัฒน์ ชัยศรีหา', PSU:'0078', อำเภอ:'สุวรรณคูหา', ตำบล:'นาด่าน', EA:'0001', สถานะ:'งานคงค้าง', หมายเหตุ:'ค้างส่ง'},
+  {ID:'NSO-NBL-69-0051-PEND', พนักงาน:'นายธนาวัฒน์ ชัยศรีหา', PSU:'0051', อำเภอ:'โนนสัง', ตำบล:'นิคมพัฒนา', EA:'0004+', สถานะ:'ยังไม่ถึงคาบงานสนาม', หมายเหตุ:'ยังไม่ถึงคาบงานสนาม'},
+  {ID:'NSO-NBL-69-0061-PEND', พนักงาน:'นายธนาวัฒน์ ชัยศรีหา', PSU:'0061', อำเภอ:'เมืองหนองบัวลำภู', ตำบล:'หนองบัวสวรรค์', EA:'0010', สถานะ:'งานคงค้าง', หมายเหตุ:'งานคงเหลือ'},
+  {ID:'NSO-NBL-69-0052-PEND', พนักงาน:'นายธนาวัฒน์ ชัยศรีหา', PSU:'0052', อำเภอ:'ศรีบุญเรือง', ตำบล:'หันนางาม', EA:'0004', สถานะ:'งานคงค้าง', หมายเหตุ:'งานคงเหลือ'},
+  {ID:'NSO-NBL-69-0049-PEND', พนักงาน:'นายธนาวัฒน์ ชัยศรีหา', PSU:'0049', อำเภอ:'เมืองหนองบัวลำภู', ตำบล:'หนองบัวสวรรค์', EA:'0007', สถานะ:'ยังไม่ถึงคาบงานสนาม', หมายเหตุ:'ยังไม่ถึงคาบงานสนาม'},
+  {ID:'NSO-NBL-69-0063-PEND', พนักงาน:'นายธนาวัฒน์ ชัยศรีหา', PSU:'0063', อำเภอ:'โนนสัง', ตำบล:'นิคมพัฒนา', EA:'0010', สถานะ:'งานคงค้าง', หมายเหตุ:'งานคงเหลือ'},
 ];
 
-const remainingData = [
-  {ID:'NSO-NBL-69-0096-PENDING', พนักงาน:'นางสาวศุจินธร ทองกรณ์', PSU:'0096', อำเภอ:'สุวรรณคูหา', ตำบล:'นาด่าน', EA:'0004', สถานะ:'งานคงค้าง', หมายเหตุ:'ค้างส่ง 11 วัน - ยังไม่ถึงคาบงานสนาม? ตรวจสอบกำหนด'},
-  {ID:'NSO-NBL-69-0076-PENDING', พนักงาน:'นางสาวศุจินธร ทองกรณ์', PSU:'0076', อำเภอ:'โนนสัง', ตำบล:'โนนสัง', EA:'0014', สถานะ:'ยังไม่ถึงคาบงานสนาม', หมายเหตุ:'ยังไม่ถึงคาบงานสนาม'},
-  {ID:'NSO-NBL-69-0073-PENDING', พนักงาน:'นางสาวศุจินธร ทองกรณ์', PSU:'0073', อำเภอ:'เมืองหนองบัวลำภู', ตำบล:'หนองบัว', EA:'0010+0003', สถานะ:'ยังไม่ถึงคาบงานสนาม', หมายเหตุ:'ยังไม่ถึงคาบงานสนาม'},
-  {ID:'NSO-NBL-69-0064-PENDING', พนักงาน:'นางสาวศุจินธร ทองกรณ์', PSU:'0064', อำเภอ:'ศรีบุญเรือง', ตำบล:'หันนางาม', EA:'0008', สถานะ:'งานคงค้าง', หมายเหตุ:'ค้างส่ง'},
-  {ID:'NSO-NBL-69-0091-PENDING', พนักงาน:'นางสาวศุจินธร ทองกรณ์', PSU:'0091', อำเภอ:'เมืองหนองบัวลำภู', ตำบล:'หนองบัว', EA:'0013', สถานะ:'ยังไม่ถึงคาบงานสนาม', หมายเหตุ:'ยังไม่ถึงคาบงานสนาม'},
-  {ID:'NSO-NBL-69-0062-PENDING', พนักงาน:'นางสาวศุจินธร ทองกรณ์', PSU:'0062', อำเภอ:'เมืองหนองบัวลำภู', ตำบล:'ป่าไม้งาม', EA:'0007', สถานะ:'งานคงค้าง', หมายเหตุ:'งานคงเหลือ'},
-  {ID:'NSO-NBL-69-0078-PENDING', พนักงาน:'นายธนาวัฒน์ ชัยศรีหา', PSU:'0078', อำเภอ:'สุวรรณคูหา', ตำบล:'นาด่าน', EA:'0001', สถานะ:'งานคงค้าง', หมายเหตุ:'ค้างส่ง'},
-  {ID:'NSO-NBL-69-0051-PENDING', พนักงาน:'นายธนาวัฒน์ ชัยศรีหา', PSU:'0051', อำเภอ:'โนนสัง', ตำบล:'นิคมพัฒนา', EA:'0004+', สถานะ:'ยังไม่ถึงคาบงานสนาม', หมายเหตุ:'ยังไม่ถึงคาบงานสนาม'},
-  {ID:'NSO-NBL-69-0061-PENDING', พนักงาน:'นายธนาวัฒน์ ชัยศรีหา', PSU:'0061', อำเภอ:'เมืองหนองบัวลำภู', ตำบล:'หนองบัวสวรรค์', EA:'0010', สถานะ:'งานคงค้าง', หมายเหตุ:'งานคงเหลือ'},
-  {ID:'NSO-NBL-69-0052-PENDING', พนักงาน:'นายธนาวัฒน์ ชัยศรีหา', PSU:'0052', อำเภอ:'ศรีบุญเรือง', ตำบล:'หันนางาม', EA:'0004', สถานะ:'งานคงค้าง', หมายเหตุ:'งานคงเหลือ'},
-  {ID:'NSO-NBL-69-0049-PENDING', พนักงาน:'นายธนาวัฒน์ ชัยศรีหา', PSU:'0049', อำเภอ:'เมืองหนองบัวลำภู', ตำบล:'หนองบัวสวรรค์', EA:'0007', สถานะ:'ยังไม่ถึงคาบงานสนาม', หมายเหตุ:'ยังไม่ถึงคาบงานสนาม'},
-  {ID:'NSO-NBL-69-0063-PENDING', พนักงาน:'นายธนาวัฒน์ ชัยศรีหา', PSU:'0063', อำเภอ:'โนนสัง', ตำบล:'นิคมพัฒนา', EA:'0010', สถานะ:'งานคงค้าง', หมายเหตุ:'งานคงเหลือ'},
-];
+// Load from localStorage or initial
+let completedData = JSON.parse(localStorage.getItem('completedData_v2') || 'null') || [...INITIAL_COMPLETED];
+let remainingData = JSON.parse(localStorage.getItem('remainingData_v2') || 'null') || [...INITIAL_REMAINING];
 
-function renderOverview(){
+function saveToStorage(){
+  localStorage.setItem('completedData_v2', JSON.stringify(completedData));
+  localStorage.setItem('remainingData_v2', JSON.stringify(remainingData));
+}
+
+let chartInstance = null;
+function getKPI(){
+  const totalAssigned = 20;
+  const totalCompleted = completedData.length;
+  const totalRemaining = remainingData.length;
+  const progress = Math.round((totalCompleted/totalAssigned)*100);
+  const totalHouse = completedData.reduce((s,r)=>s+(Number(r.ปริมาณ)||0),0);
+  const validHouse = completedData.reduce((s,r)=>s+(Number(r.ได้)||0),0);
+  const lateCount = completedData.filter(r=>r.ช้า>0).length;
+  return {totalAssigned, totalCompleted, totalRemaining, progress, totalHouse, validHouse, lateCount};
+}
+
+function showToast(msg, type='success'){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = `fixed bottom-5 right-5 px-5 py-3 rounded-xl shadow-2xl text-[13px] z-50 ${type==='success'?'bg-emerald-600':'bg-red-600'} text-white`;
+  t.classList.remove('hidden');
+  setTimeout(()=>t.classList.add('hidden'), 3000);
+}
+
+function renderAll(){
+  const kpi = getKPI();
+  // KPI Grid
+  document.getElementById('kpiGrid').innerHTML = `
+    <div class="bg-white rounded-2xl p-5 border"><div class="text-[11px] text-slate-400 uppercase">มอบหมาย</div><div class="text-3xl font-bold mt-1">${kpi.totalAssigned}</div><div class="text-[11px] text-slate-500">EA</div></div>
+    <div class="bg-white rounded-2xl p-5 border"><div class="text-[11px] text-emerald-600 uppercase">เสร็จแล้ว</div><div class="text-3xl font-bold mt-1 text-emerald-600">${kpi.totalCompleted}</div><div class="text-[11px] text-emerald-600">${kpi.progress}%</div></div>
+    <div class="bg-white rounded-2xl p-5 border"><div class="text-[11px] text-amber-600 uppercase">คงเหลือ</div><div class="text-3xl font-bold mt-1 text-amber-600">${kpi.totalRemaining}</div><div class="text-[11px]">EA</div></div>
+    <div class="bg-white rounded-2xl p-5 border"><div class="text-[11px] text-slate-400 uppercase">ครัวเรือน</div><div class="text-3xl font-bold mt-1">${kpi.totalHouse}</div><div class="text-[11px]">ได้ ${kpi.validHouse}</div></div>
+    <div class="bg-white rounded-2xl p-5 border"><div class="text-[11px] text-slate-400 uppercase">ประสิทธิภาพ</div><div class="text-3xl font-bold mt-1">100%</div><div class="text-[11px] text-emerald-600">เฉลี่ย</div></div>
+    <div class="bg-white rounded-2xl p-5 border"><div class="text-[11px] text-red-500 uppercase">ส่งช้า</div><div class="text-3xl font-bold mt-1 text-red-500">${kpi.lateCount}</div><div class="text-[11px] text-red-500">รายการ</div></div>
+  `;
+  document.getElementById('kpiProgressHeader').textContent = `${kpi.progress}% เสร็จ`;
+  document.getElementById('remainingBadge').textContent = kpi.totalRemaining;
+
+  // Chart
   const ctx = document.getElementById('progressChart').getContext('2d');
-  new Chart(ctx, {type:'doughnut', data:{labels:['เสร็จ 8 EA','คงเหลือ 12 EA'], datasets:[{data:[8,12], backgroundColor:['#10b981','#f59e0b'], borderWidth:0}]}, options:{cutout:'70%', plugins:{legend:{position:'bottom', labels:{boxWidth:12, font:{size:11}}}}}});
-  
-  const byPerson = {};
-  completedData.forEach(r=>{
-    if(!byPerson[r.พนักงาน]) byPerson[r.พนักงาน] = {มอบ:0,เสร็จ:0,คง:0, id:[]};
-    byPerson[r.พนักงาน].เสร็จ++;
-    byPerson[r.พนักงาน].id.push(r.ID);
-  });
-  // มอบหมายจริง
-  byPerson['น.ส.พัชริดา บุญอุ้ม'] = {...byPerson['น.ส.พัชริดา บุญอุ้ม'], มอบ:1, คง:0};
-  byPerson['นายสันติ แซ่ลิ้ม'] = {...byPerson['นายสันติ แซ่ลิ้ม'], มอบ:1, คง:0};
-  byPerson['นางสาวศุจินธร ทองกรณ์'] = {...byPerson['นางสาวศุจินธร ทองกรณ์'], มอบ:9, คง:6};
-  byPerson['นายธนาวัฒน์ ชัยศรีหา'] = {...byPerson['นายธนาวัฒน์ ชัยศรีหา'], มอบ:9, คง:6};
+  if(chartInstance) chartInstance.destroy();
+  chartInstance = new Chart(ctx, {type:'doughnut', data:{labels:[`เสร็จ ${kpi.totalCompleted} EA`,`คงเหลือ ${kpi.totalRemaining} EA`], datasets:[{data:[kpi.totalCompleted, kpi.totalRemaining], backgroundColor:['#10b981','#f59e0b'], borderWidth:0}]}, options:{cutout:'70%', plugins:{legend:{position:'bottom', labels:{boxWidth:12, font:{size:11}}}}}});
+  document.getElementById('progressDetail').innerHTML = `มอบหมาย ${kpi.totalAssigned} EA • เสร็จ ${kpi.totalCompleted} EA • คงเหลือ ${kpi.totalRemaining} EA • คืบหน้า ${kpi.progress}%`;
 
-  const body = document.getElementById('personSummaryBody');
-  body.innerHTML = Object.entries(byPerson).map(([name, v])=>`
-    <tr class="border-b"><td class="py-2.5"><span class="id-badge bg-slate-100 px-2 py-1 rounded text-[10px]">${v.id[0]?.substring(0,20)}...</span></td><td class="py-2.5 font-medium">${name}</td><td class="text-center">${v.มอบ}</td><td class="text-center text-emerald-600 font-bold">${v.เสร็จ}</td><td class="text-center text-amber-600">${v.คง}</td><td class="text-center"><span class="bg-emerald-100 text-emerald-700 px-2 py-1 rounded-full text-[11px]">${Math.round(v.เสร็จ/v.มอบ*100)}%</span></td></tr>
-  `).join('');
-}
-
-function renderPerson(){
+  // Person Summary
   const byPerson = {};
-  completedData.forEach(r=>{ if(!byPerson[r.พนักงาน]) byPerson[r.พนักงาน]=[]; byPerson[r.พนักงาน].push(r); });
-  document.getElementById('personCards').innerHTML = Object.entries(byPerson).map(([name, rows])=>{
-    const total = name.includes('พัชริดา')||name.includes('สันติ')?1:9;
+  completedData.forEach(r=>{ if(!byPerson[r.พนักงาน]) byPerson[r.พนักงาน]={มอบ:0,เสร็จ:0, id:[]}; byPerson[r.พนักงาน].เสร็จ++; byPerson[r.พนักงาน].id.push(r.ID); });
+  // กำหนดมอบหมายจริง
+  const assignMap = {'น.ส.พัชริดา บุญอุ้ม':1,'นายสันติ แซ่ลิ้ม':1,'นางสาวศุจินธร ทองกรณ์':9,'นายธนาวัฒน์ ชัยศรีหา':9};
+  Object.keys(assignMap).forEach(name=>{ if(!byPerson[name]) byPerson[name]={มอบ:assignMap[name],เสร็จ:0,id:[]}; byPerson[name].มอบ=assignMap[name]; });
+  Object.keys(byPerson).forEach(name=>{ byPerson[name].คง = byPerson[name].มอบ - byPerson[name].เสร็จ; });
+
+  document.getElementById('personSummary').innerHTML = `<table class="w-full text-[13px]"><thead class="text-[11px] text-slate-400 uppercase"><tr><th class="text-left py-2">ID ล่าสุด</th><th class="text-left">พนักงาน</th><th>มอบ</th><th>เสร็จ</th><th>คงเหลือ</th><th>คืบหน้า</th></tr></thead><tbody>${Object.entries(byPerson).map(([name,v])=>`<tr class="border-b"><td class="py-2"><span class="id-badge bg-slate-100 px-2 py-1 rounded text-[10px]">${(v.id[0]||' - ').substring(0,22)}...</span></td><td class="font-medium">${name}</td><td class="text-center">${v.มอบ}</td><td class="text-center text-emerald-600 font-bold">${v.เสร็จ}</td><td class="text-center ${v.คง>0?'text-amber-600':'text-slate-400'}">${v.คง}</td><td class="text-center"><div class="w-16 bg-slate-100 rounded-full h-1.5 mx-auto"><div class="bg-emerald-500 h-1.5 rounded-full" style="width:${Math.round(v.เสร็จ/v.มอบ*100)}%"></div></div><span class="text-[11px]">${Math.round(v.เสร็จ/v.มอบ*100)}%</span></td></tr>`).join('')}</tbody></table>`;
+
+  // Person Cards
+  const grouped = {};
+  completedData.forEach(r=>{ if(!grouped[r.พนักงาน]) grouped[r.พนักงาน]=[]; grouped[r.พนักงาน].push(r); });
+  document.getElementById('personCards').innerHTML = Object.entries(grouped).map(([name,rows])=>{
+    const total = assignMap[name]||1;
     const done = rows.length;
-    const remain = total-done;
     const late = rows.filter(r=>r.ช้า>0).length;
-    return `<div class="bg-white rounded-2xl p-6 shadow-sm border">
-      <div class="flex justify-between items-start mb-4">
-        <div><div class="font-semibold">${name}</div><div class="text-[11px] text-slate-500">ควบคุม: น.ส.สุธาทิพย์ สุหงษา</div></div>
-        <span class="text-[11px] ${late>0?'bg-red-100 text-red-700':'bg-emerald-100 text-emerald-700'} px-2.5 py-1 rounded-full">${late>0?`ส่งช้า ${late}`:'ตรงเวลาทั้งหมด'}</span>
-      </div>
-      <div class="grid grid-cols-3 gap-3 mb-4">
-        <div class="bg-slate-50 rounded-xl p-3 text-center"><div class="text-[11px] text-slate-400">มอบหมาย</div><div class="font-bold text-lg">${total}</div></div>
-        <div class="bg-emerald-50 rounded-xl p-3 text-center"><div class="text-[11px] text-emerald-600">เสร็จ</div><div class="font-bold text-lg text-emerald-600">${done}</div></div>
-        <div class="bg-amber-50 rounded-xl p-3 text-center"><div class="text-[11px] text-amber-600">คงเหลือ</div><div class="font-bold text-lg text-amber-600">${remain}</div></div>
-      </div>
-      <div class="space-y-2">
-        ${rows.map(r=>`<div class="flex justify-between items-center bg-slate-50 rounded-lg p-2.5"><div><div class="id-badge text-[10px] text-slate-500">${r.ID}</div><div class="text-[12px] font-medium">PSU ${r.PSU} EA ${r.EA} ${r.อำเภอ}</div></div><div class="text-right"><div class="text-[11px] ${r.ช้า>0?'text-red-600 font-bold':'text-emerald-600'}">${r.ช้า_text}</div><div class="text-[10px] text-slate-500">${r.ปฏิบัติ} → ${r.ส่ง}</div></div></div>`).join('')}
-      </div>
-    </div>`;
-  }).join('');
+    return `<div class="bg-white rounded-2xl p-6 border shadow-sm"><div class="flex justify-between mb-4"><div><div class="font-bold">${name}</div><div class="text-[11px] text-slate-500">มอบ ${total} เสร็จ ${done} คงเหลือ ${total-done}</div></div><span class="text-[11px] ${late>0?'bg-red-100 text-red-700':'bg-emerald-100 text-emerald-700'} px-2.5 py-1 rounded-full font-bold">${late>0?`ช้า ${late}`:'ตรงเวลาทั้งหมด'}</span></div><div class="w-full bg-slate-100 rounded-full h-2 mb-4"><div class="bg-emerald-500 h-2 rounded-full transition-all duration-500" style="width:${Math.round(done/total*100)}%"></div></div><div class="space-y-2 max-h-[260px] overflow-auto">${rows.map(r=>`<div class="flex justify-between items-center bg-slate-50 rounded-lg p-2.5 border"><div><div class="id-badge text-[10px] text-slate-500">${r.ID}</div><div class="text-[12px] font-medium">PSU ${r.PSU} EA ${r.EA} ${r.อำเภอ}</div><div class="text-[10px] text-slate-500">${r.ตำบล}</div></div><div class="text-right"><div class="text-[11px] ${r.ช้า>0?'text-red-600 font-bold':'text-emerald-600'}">${r.ช้า_text}</div><div class="text-[10px] text-slate-500">${r.ปฏิบัติ} → ${r.ส่ง}</div></div></div>`).join('')}</div></div>`;
+  }).join('') || '<div class="text-center py-10 text-slate-400">ยังไม่มีข้อมูล</div>';
+
+  // Late Table
+  const lateRows = completedData.filter(r=>r.ช้า>0);
+  document.getElementById('lateTable').innerHTML = `<div class="overflow-auto"><table class="w-full text-[12px]"><thead class="text-[11px] text-slate-400 uppercase"><tr><th class="text-left py-2">ID</th><th>PSU</th><th>พนักงาน</th><th>เวลาช้า</th></tr></thead><tbody>${lateRows.map(r=>`<tr class="border-b"><td class="py-2"><span class="id-badge bg-red-50 text-red-700 px-2 py-1 rounded text-[10px]">${r.ID.substring(0,18)}...</span></td><td>${r.PSU}</td><td>${r.พนักงาน.split(' ')[0]}</td><td><span class="bg-red-100 text-red-700 px-2 py-1 rounded-full text-[11px] font-bold">${r.ช้า_text}</span><div class="text-[10px] text-slate-500">${r.ปฏิบัติ} → ${r.ส่ง} = ${r.ช้า} วัน</div></td></tr>`).join('') || '<tr><td colspan=4 class="py-8 text-center text-slate-400">✅ ไม่มีงานส่งช้า</td></tr>'}</tbody></table></div>`;
+
+  // Remaining Table
+  document.getElementById('remainingTable').innerHTML = `<div class="overflow-auto max-h-[420px]"><table class="w-full text-[12px]"><thead class="sticky top-0 bg-white text-[11px] text-slate-400 uppercase"><tr><th class="text-left py-2">ID</th><th>PSU</th><th>อำเภอ</th><th>สถานะ</th><th>Action</th></tr></thead><tbody>${remainingData.map(r=>`<tr class="border-b hover:bg-slate-50"><td class="py-2"><span class="id-badge bg-slate-100 px-1.5 py-1 rounded text-[9px]">${r.ID.substring(0,16)}...</span></td><td class="font-medium">${r.PSU}</td><td>${r.อำเภอ}<div class="text-[10px] text-slate-500">${r.ตำบล}</div></td><td><span class="px-2 py-1 rounded-full text-[10px] font-bold ${r.สถานะ.includes('ยังไม่ถึง')?'bg-slate-200 text-slate-600':'bg-amber-100 text-amber-700'}">${r.สถานะ}</span><div class="text-[10px] text-slate-500">${r.หมายเหตุ}</div></td><td><button onclick="quickFill('${r.PSU}')" class="text-[11px] bg-blue-600 text-white px-2.5 py-1 rounded-full hover:bg-blue-700">กรอก</button></td></tr>`).join('') || '<tr><td colspan=5 class="py-8 text-center text-emerald-600 font-bold">🎉 เสร็จครบทั้งหมดแล้ว!</td></tr>'}</tbody></table></div>`;
+
+  // Saved Table
+  document.getElementById('savedTable').innerHTML = `<table class="w-full text-[11px]"><thead class="text-slate-400"><tr><th class="text-left">ID</th><th>พนักงาน</th><th>PSU</th><th>ช้า</th><th>เวลา</th></tr></thead><tbody>${completedData.slice(0,12).map(r=>`<tr class="border-b"><td class="py-1.5"><span class="id-badge bg-blue-50 text-blue-700 px-1.5 py-0.5 rounded text-[9px]">${r.ID.substring(0,22)}...</span></td><td>${r.พนักงาน.split(' ')[0]}</td><td>${r.PSU}</td><td class="${r.ช้า>0?'text-red-600 font-bold':'text-emerald-600'}">${r.ช้า_text}</td><td class="text-[10px] text-slate-500">${r.ส่ง}</td></tr>`).join('')}</tbody></table>`;
 }
 
-function renderLate(){
-  document.getElementById('lateTable').innerHTML = `<div class="overflow-auto"><table class="w-full text-[12px]"><thead class="text-[11px] text-slate-400 uppercase"><tr><th class="text-left py-2">ID</th><th>PSU</th><th>ผู้ปฏิบัติ</th><th>ช้า</th></tr></thead><tbody>${completedData.filter(r=>r.ช้า>0).map(r=>`<tr class="border-b"><td class="py-2"><span class="id-badge bg-red-50 text-red-700 px-2 py-1 rounded text-[10px]">${r.ID.substring(0,18)}...</span></td><td>${r.PSU}</td><td>${r.พนักงาน.split(' ')[0]}</td><td><span class="bg-red-100 text-red-700 px-2 py-1 rounded-full text-[11px] font-bold">${r.ช้า_text}</span><div class="text-[10px] text-slate-500">${r.ปฏิบัติ} → ${r.ส่ง}</div></td></tr>`).join('') || '<tr><td colspan=4 class="py-4 text-center text-slate-400">ไม่มีงานส่งช้า ✅</td></tr>'}</tbody></table></div>`;
-  
-  document.getElementById('remainingTable').innerHTML = `<div class="overflow-auto max-h-[400px]"><table class="w-full text-[12px]"><thead class="sticky top-0 bg-white text-[11px] text-slate-400 uppercase"><tr><th class="text-left py-2">ID</th><th>PSU</th><th>อำเภอ</th><th>สถานะ</th></tr></thead><tbody>${remainingData.map(r=>`<tr class="border-b"><td class="py-2"><span class="id-badge bg-slate-100 px-1.5 py-1 rounded text-[9px]">${r.ID.substring(0,16)}...</span></td><td>${r.PSU}</td><td>${r.อำเภอ}</td><td><span class="px-2 py-1 rounded-full text-[10px] ${r.สถานะ.includes('ยังไม่ถึง')?'bg-slate-200 text-slate-600':'bg-amber-100 text-amber-700'}">${r.สถานะ}</span><div class="text-[10px] text-slate-500">${r.หมายเหตุ}</div></td></tr>`).join('')}</tbody></table></div>`;
-}
-
-// FORM LOGIC
-let savedLocal = [...completedData];
 function calcDelay(){
-  const w = document.getElementById('f_work').value;
-  const s = document.getElementById('f_send').value;
-  const badge = document.getElementById('delayBadge');
-  if(!w||!s){ badge.textContent='-'; badge.className='mt-1 px-3 py-2.5 rounded-xl bg-slate-100 text-[13px]'; return {days:0};}
+  const w=document.getElementById('f_work').value;
+  const s=document.getElementById('f_send').value;
+  const badge=document.getElementById('delayBadge');
+  if(!w||!s){badge.textContent='-';badge.className='mt-1 px-3 py-2.5 rounded-xl bg-slate-100 text-[13px]';return {days:0,hours:0};}
   const d1=new Date(w), d2=new Date(s);
-  const diff = Math.floor((d2-d1)/(1000*60*60*24));
-  const hours = Math.floor(((d2-d1)%(1000*60*60*24))/(1000*60*60));
-  if(diff<=0){ badge.textContent='ส่งตรงเวลา (0 วัน)'; badge.className='mt-1 px-3 py-2.5 rounded-xl bg-emerald-100 text-emerald-700 text-[13px] font-bold'; return {days:0};}
-  badge.textContent=`ช้า ${diff} วัน ${hours} ชม. (${w} → ${s})`;
+  const diffMs=d2-d1;
+  const days=Math.floor(diffMs/(1000*60*60*24));
+  const hours=Math.floor((diffMs%(1000*60*60*24))/(1000*60*60));
+  if(days<=0 && hours<=0){badge.textContent='ส่งตรงเวลา (0 วัน 0 ชม.)';badge.className='mt-1 px-3 py-2.5 rounded-xl bg-emerald-100 text-emerald-700 text-[13px] font-bold';return {days:0,hours:0,text:'ส่งตรงเวลา'};}
+  const txt=`ช้า ${days} วัน ${hours} ชม. (${w} → ${s})`;
+  badge.textContent=txt;
   badge.className='mt-1 px-3 py-2.5 rounded-xl bg-red-100 text-red-700 text-[13px] font-bold';
-  return {days:diff, hours};
+  return {days,hours,text:txt};
 }
 function genId(){
-  const psu = document.getElementById('f_psu').value || 'XXXX';
-  const now = new Date();
-  const dateStr = now.toISOString().slice(0,10).replace(/-/g,'')+'-'+now.toTimeString().slice(0,8).replace(/:/g,'');
-  const rand = Math.random().toString(36).substring(2,6).toUpperCase();
-  const id = `NSO-NBL-69-${psu.padStart(4,'0')}-${dateStr}-${rand}`;
-  document.getElementById('f_id').value = id;
+  const psu=document.getElementById('f_psu').value||'XXXX';
+  const now=new Date();
+  const ds=now.toISOString().slice(0,10).replace(/-/g,'')+'-'+now.toTimeString().slice(0,8).replace(/:/g,'');
+  const rand=Math.random().toString(36).substring(2,6).toUpperCase();
+  const id=`NSO-NBL-69-${psu.padStart(4,'0')}-${ds}-${rand}`;
+  document.getElementById('f_id').value=id;
   return id;
 }
-document.getElementById('f_psu')?.addEventListener('input', genId);
-document.getElementById('f_work')?.addEventListener('change', calcDelay);
-document.getElementById('f_send')?.addEventListener('change', calcDelay);
-document.getElementById('genIdBtn')?.addEventListener('click', genId);
-document.getElementById('entryForm')?.addEventListener('submit', e=>{
-  e.preventDefault();
-  const id = document.getElementById('f_id').value || genId();
-  const delay = calcDelay();
-  const rec = {
-    ID:id, พนักงาน:document.getElementById('f_person').value, อำเภอ:document.getElementById('f_district').value, ตำบล:document.getElementById('f_sub').value,
-    EA:document.getElementById('f_ea').value, PSU:document.getElementById('f_psu').value, ปฏิบัติ:document.getElementById('f_work').value, ส่ง:document.getElementById('f_send').value,
-    ช้า:delay.days, ช้า_text:document.getElementById('delayBadge').textContent, ปริมาณ:document.getElementById('f_total').value, ได้:document.getElementById('f_valid').value
-  };
-  savedLocal.unshift(rec);
-  renderSaved();
-  // ถ้าเป็น Google Apps Script จะส่งไป Sheet
-  if(window.google && google.script && google.script.run){
-    google.script.run.withSuccessHandler(r=>alert('บันทึกสำเร็จ ID: '+r.ID)).withFailureHandler(e=>alert('Error: '+e.message)).addRecord({
-      ID:id, พนักงาน:rec.พนักงาน, อำเภอ:rec.อำเภอ, ตำบล:rec.ตำบล, EA:rec.EA, PSU:rec.PSU, ปฏิบัติ:rec.ปฏิบัติ, ส่ง:rec.ส่ง, ปริมาณ:rec.ปริมาณ, ได้ข้อมูล:rec.ได้
-    });
-  } else {
-    alert('บันทึก Local สำเร็จ ID: '+id+' (Demo Mode - ไม่มี Google Sheets)');
-  }
-});
-function renderSaved(){
-  document.getElementById('savedTable').innerHTML = `<table class="w-full text-[11px]"><thead><tr class="text-slate-400"><th class="text-left">ID</th><th>พนักงาน</th><th>PSU</th><th>ส่งช้า</th></tr></thead><tbody>${savedLocal.slice(0,10).map(r=>`<tr class="border-b"><td class="py-1"><span class="id-badge bg-blue-50 text-blue-700 px-1 py-0.5 rounded text-[9px]">${r.ID.substring(0,20)}...</span></td><td>${r.พนักงาน?.split(' ')[0]}</td><td>${r.PSU}</td><td class="${r.ช้า>0?'text-red-600 font-bold':'text-emerald-600'}">${r.ช้า_text||'0 วัน'}</td></tr>`).join('')}</tbody></table>`;
+function quickFill(psu){
+  const found = remainingData.find(r=>r.PSU===psu);
+  if(!found) return;
+  document.querySelector('[data-tab="form"]').click();
+  document.getElementById('f_psu').value=found.PSU;
+  document.getElementById('f_ea').value=found.EA;
+  document.getElementById('f_district').value=found.อำเภอ;
+  document.getElementById('f_sub').value=found.ตำบล;
+  document.getElementById('f_person').value=found.พนักงาน;
+  genId(); calcDelay();
+  showToast(`กรอกข้อมูล PSU ${psu} จากงานคงเหลือแล้ว - กดบันทึกเพื่อย้ายสถานะ`, 'success');
 }
 
-// TABS
+// FORM SUBMIT - สำคัญ: อัปเดตสถานะทันที
+document.getElementById('entryForm').addEventListener('submit', e=>{
+  e.preventDefault();
+  const id=document.getElementById('f_id').value||genId();
+  const delay=calcDelay();
+  const newRec={
+    ID:id, พนักงาน:document.getElementById('f_person').value, อำเภอ:document.getElementById('f_district').value, ตำบล:document.getElementById('f_sub').value,
+    EA:document.getElementById('f_ea').value, PSU:document.getElementById('f_psu').value, ปฏิบัติ:document.getElementById('f_work').value, ส่ง:document.getElementById('f_send').value,
+    ช้า:delay.days, ช้า_text:document.getElementById('delayBadge').textContent, ปริมาณ:parseInt(document.getElementById('f_total').value)||16, ได้:parseInt(document.getElementById('f_valid').value)||0, ไม่ได้:parseInt(document.getElementById('f_invalid').value)||0, ร้อยละ:100, หมายเหตุ:document.getElementById('f_note').value
+  };
+  // 1. เพิ่มใน completed
+  completedData.unshift(newRec);
+  // 2. ลบออกจาก remaining ถ้า PSU ตรงกัน
+  const beforeLen = remainingData.length;
+  remainingData = remainingData.filter(r=>r.PSU!==newRec.PSU);
+  const removed = beforeLen - remainingData.length;
+  // 3. Save + Render
+  saveToStorage();
+  renderAll();
+  showToast(`✅ บันทึกสำเร็จ ID: ${id} | ย้ายจากคงเหลือ ${removed>0?'(ลบ '+removed+' รายการ)':''} → เสร็จแล้ว | ${newRec.ช้า_text}`, 'success');
+  
+  // ถ้ามี google.script.run ให้ส่งไป Sheet ด้วย
+  if(window.google && google.script && google.script.run){
+    google.script.run.withSuccessHandler(r=>{
+      console.log('Saved to Sheet', r);
+    }).withFailureHandler(err=>{
+      console.error(err);
+    }).addRecord({
+      ID:id, พนักงาน:newRec.พนักงาน, อำเภอ:newRec.อำเภอ, ตำบล:newRec.ตำบล, EA:newRec.EA, PSU:newRec.PSU, ปฏิบัติ:newRec.ปฏิบัติ, ส่ง:newRec.ส่ง, ปริมาณ:newRec.ปริมาณ, ได้ข้อมูล:newRec.ได้, หมายเหตุ:newRec.หมายเหตุ
+    });
+  }
+  // ไม่รีเซ็ตฟอร์มทั้งหมดเพื่อให้กรอกต่อได้ แต่ล้าง PSU/EA
+  document.getElementById('f_psu').value=''; document.getElementById('f_ea').value=''; genId();
+});
+
+document.getElementById('f_psu').addEventListener('input', genId);
+document.getElementById('f_work').addEventListener('change', calcDelay);
+document.getElementById('f_send').addEventListener('change', calcDelay);
+document.getElementById('genIdBtn').addEventListener('click', genId);
+document.getElementById('clearForm').addEventListener('click', ()=>{document.getElementById('entryForm').reset(); genId(); calcDelay();});
+document.getElementById('resetData').addEventListener('click', ()=>{if(confirm('รีเซ็ตข้อมูลทั้งหมดกลับค่าเริ่มต้น?')){localStorage.removeItem('completedData_v2');localStorage.removeItem('remainingData_v2');completedData=[...INITIAL_COMPLETED];remainingData=[...INITIAL_REMAINING];saveToStorage();renderAll();showToast('รีเซ็ตแล้ว');}});
+
 document.querySelectorAll('.tab-btn').forEach(btn=>{
   btn.addEventListener('click',()=>{
-    document.querySelectorAll('.tab-btn').forEach(b=>{b.classList.remove('active','bg-slate-900','text-white'); b.classList.add('bg-white','border');});
-    btn.classList.add('active','bg-slate-900','text-white'); btn.classList.remove('bg-white','border');
+    document.querySelectorAll('.tab-btn').forEach(b=>{b.classList.remove('active','bg-slate-900','text-white');b.classList.add('bg-white','border');});
+    btn.classList.add('active','bg-slate-900','text-white');btn.classList.remove('bg-white','border');
     document.querySelectorAll('.tab-panel').forEach(p=>p.classList.add('hidden'));
     document.getElementById('tab-'+btn.dataset.tab).classList.remove('hidden');
   });
 });
 
-renderOverview(); renderPerson(); renderLate(); renderSaved(); calcDelay(); genId();
+renderAll(); calcDelay(); genId();
 </script>
 </body>
 </html>
